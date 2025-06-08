@@ -13,6 +13,8 @@ SRC	+=	utils/utils.c
 
 SRC	+=	parsing/readline.c
 
+SRC	+=	prompt/generate_prompt.c
+
 CC	=	cc
 
 CFLAGS	=	-Wall -Wextra -Werror -MMD -g3

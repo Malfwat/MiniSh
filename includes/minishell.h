@@ -29,4 +29,7 @@ bool	ms_set_sighandler(void);
 
 int	get_cmd_line_fd(int	*fd);
 
+//Prompt
+
+char	*expand_prompt(char *prompt_raw);
 #endif
