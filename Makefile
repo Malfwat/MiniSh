@@ -1,3 +1,15 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    Makefile                                           :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: malfwa <admoufle@student.42.fr>            +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2025/06/09 18:24:33 by malfwa            #+#    #+#              #
+#    Updated: 2025/06/09 18:25:26 by malfwa           ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
+
 NAME	=	minishell
 
 SRC	=	main.c
@@ -48,9 +60,11 @@ $(BUILD)%.o:	$(SRC_DIR)%.c Makefile
 
 clean:
 	rm -rf $(BUILD)
+	rm -rf srcs/printf/.build
 
 fclean:	clean
 	rm -rf $(NAME)
+	make fclean -C srcs/printf
 
 re: fclean all
 

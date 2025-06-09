@@ -18,6 +18,7 @@ void	sigint_handler(int sig)
 {
 	(void)sig;
 	write(STDOUT_FILENO, "\n", 1);
+	ft_putstr_fd(rl_prompt, STDOUT_FILENO);
 	rl_replace_line("", 0);
 	rl_on_new_line();
 	rl_redisplay();

@@ -1,5 +1,33 @@
 #include <stdbool.h>
 #include <stdlib.h>
+#include <unistd.h>
+
+void	print_until(char *str, char c, int fd)
+{
+	int	i;
+
+	i = 0;
+	if (!str || !*str || fd < 0)
+		return ;
+	while (str[i] && str[i] != c)
+		i++;
+	write(fd, str, i);
+}
+
+char	*_basename(char *str)
+{
+	int	i;
+
+	i = 0;
+	if (!str || !*str)
+		return (str);
+	while (str[i])
+		i++;
+	i--;
+	while (str[i] != '/' && i > 0)
+		i--;
+	return (str + i);
+}
 
 char	*pass_whitespace(char *str)
 {

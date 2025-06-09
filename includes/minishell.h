@@ -1,18 +1,30 @@
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
-# include <stdbool.h>
+# define PROMPT_CHARSET "uhHwW$\\"
+# define HOSTNAME_FILE	"/etc/hostname"
+# define PROMPT "minishell> "
 
-enum e_state
+# include <stdbool.h>
+# include <limits.h>
+# include <unistd.h>
+
+typedef struct s_prompt
 {
-	leave
-};
+	char		*hostname;
+	char		cwd[PATH_MAX];
+	char const	*cwd_basename;
+	char const	*user;
+	char const	*prompt;
+}	t_prompt;
 
 //Utils
 
 char	*pass_whitespace(char *str);
 int		get_exit_value(int status);
 bool	is_child(pid_t pid);
+char	*_basename(char *str);
+void	print_until(char *str, char c, int fd);
 
 //History
 
@@ -27,9 +39,10 @@ bool	ms_set_sighandler(void);
 
 //Parsing 
 
-int	get_cmd_line_fd(int	*fd);
+int	get_cmd_line_fd(int	*fd, t_prompt prompt);
 
 //Prompt
 
-char	*expand_prompt(char *prompt_raw);
+void	expand_prompt(t_prompt prompt);
+bool	update_prompt_var(t_prompt *ptr);
 #endif

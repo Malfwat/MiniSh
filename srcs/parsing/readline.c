@@ -5,14 +5,20 @@
 #include <stdlib.h>
 #include "minishell.h"
 
-void	rdl_child(int pipe_fds[2], pid_t pid)
+void	rdl_child(int pipe_fds[2], pid_t pid, t_prompt prompt)
 {
 	char	*ptr;
 
 	if (is_child(pid))
 	{
 		set_sigint_handler(pipe_fds);
-		ptr = readline("minishell> ");
+		if (prompt.prompt)
+		{
+			expand_prompt(prompt);
+			ptr = readline("");
+		}
+		else
+			ptr = readline(PROMPT);
 		if (ptr && *ptr)
 			ft_putstr_fd(ptr, pipe_fds[1]);
 		else if (ptr)
@@ -24,7 +30,7 @@ void	rdl_child(int pipe_fds[2], pid_t pid)
 	}
 }
 
-int	get_cmd_line_fd(int	*fd)
+int	get_cmd_line_fd(int	*fd, t_prompt prompt)
 {
 	int		pipe_fds[2];
 	int		status;
@@ -35,7 +41,7 @@ int	get_cmd_line_fd(int	*fd)
 	pid = fork();
 	if (pid < 0)
 		return (close(pipe_fds[0]), close(pipe_fds[1]), -1);
-	rdl_child(pipe_fds, pid);
+	rdl_child(pipe_fds, pid, prompt);
 	close(pipe_fds[1]);
 	wait(&status);
 	*fd = pipe_fds[0];

@@ -9,18 +9,22 @@ int	main(int ac, char **av, char **env)
 {
 	(void)ac; (void)av; (void)env;
 
-	char	*str;
-	char	*prev_cmdline = NULL;
-	int		fd;
-	int		history_fd;
-	int		ret_val;
+	char		*str;
+	char		*prev_cmdline = NULL;
+	int			fd;
+	int			history_fd;
+	int			ret_val;
+	t_prompt	prompt_var;
 	
+	ft_bzero(&prompt_var, sizeof(t_prompt));
+	update_prompt_var(&prompt_var);
+	prompt_var.prompt = "\\u@\\h\\$ ";
 	if (!ms_set_sighandler())
 		return (ft_putendl_fd("Error setting signals", 2), 1);
 	history_fd = ms_get_history_fd();
 	while (1)
 	{
-		ret_val = get_cmd_line_fd(&fd);
+		ret_val = get_cmd_line_fd(&fd, prompt_var);
 		if (ret_val == -1)
 			return (1);
 		str = get_next_line(fd);

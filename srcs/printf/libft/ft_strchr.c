@@ -21,6 +21,8 @@ char	*ft_strchr(const char *s, int c)
 	a = (char)c;
 	str = (char *)s;
 	i = 0;
+	if (!s)
+		return (NULL);
 	while (str[i])
 	{
 		if (str[i] == a)
