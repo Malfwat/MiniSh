@@ -13,9 +13,10 @@ typedef struct s_prompt
 {
 	char		*hostname;
 	char		cwd[PATH_MAX];
+	char		*prompt;
 	char const	*cwd_basename;
 	char const	*user;
-	char const	*prompt;
+	char const	*prompt_raw;
 }	t_prompt;
 
 //Utils
@@ -43,6 +44,6 @@ int	get_cmd_line_fd(int	*fd, t_prompt prompt);
 
 //Prompt
 
-void	expand_prompt(t_prompt prompt);
+bool	expand_prompt(t_prompt *prompt);
 bool	update_prompt_var(t_prompt *ptr);
 #endif

@@ -26,7 +26,7 @@ char	*_basename(char *str)
 	i--;
 	while (str[i] != '/' && i > 0)
 		i--;
-	return (str + i);
+	return (str + i + (str[i] == '/'));
 }
 
 char	*pass_whitespace(char *str)

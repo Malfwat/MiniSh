@@ -13,10 +13,7 @@ void	rdl_child(int pipe_fds[2], pid_t pid, t_prompt prompt)
 	{
 		set_sigint_handler(pipe_fds);
 		if (prompt.prompt)
-		{
-			expand_prompt(prompt);
-			ptr = readline("");
-		}
+			ptr = readline(prompt.prompt);
 		else
 			ptr = readline(PROMPT);
 		if (ptr && *ptr)
@@ -26,6 +23,7 @@ void	rdl_child(int pipe_fds[2], pid_t pid, t_prompt prompt)
 		close(pipe_fds[0]);
 		close(pipe_fds[1]);
 		free(ptr);
+		free(prompt.prompt);
 		exit(0);
 	}
 }

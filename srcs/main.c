@@ -17,8 +17,8 @@ int	main(int ac, char **av, char **env)
 	t_prompt	prompt_var;
 	
 	ft_bzero(&prompt_var, sizeof(t_prompt));
+	prompt_var.prompt_raw = "\e[96m\\u\e[0m@\\h:\\W\\$ ";
 	update_prompt_var(&prompt_var);
-	prompt_var.prompt = "\\u@\\h\\$ ";
 	if (!ms_set_sighandler())
 		return (ft_putendl_fd("Error setting signals", 2), 1);
 	history_fd = ms_get_history_fd();
@@ -43,6 +43,8 @@ int	main(int ac, char **av, char **env)
 	}
 	close(history_fd);
 	free(prev_cmdline);
+	free(prompt_var.prompt);
+	free(prompt_var.hostname);
 	rl_clear_history();
 	return (0);
 }
