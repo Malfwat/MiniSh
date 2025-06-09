@@ -4,6 +4,22 @@
 #include <sys/wait.h>
 #include <fcntl.h>
 
+void	write_cwd(t_prompt *prompt)
+{
+	int		len;
+	char	*home;
+
+	home = getenv("HOME");
+	len = ft_strlen(home);
+	if (!ft_strncmp(prompt->cwd, home, len))
+	{
+		ft_putstr_fd("~", STDOUT_FILENO);
+		ft_putstr_fd(prompt->cwd + len, STDOUT_FILENO);
+	}
+	else
+		ft_putstr_fd(prompt->cwd, STDOUT_FILENO);
+}
+
 int	write_prompt_elem(t_prompt *prompt, char c)
 {
 	if (c == 'h')
@@ -13,7 +29,7 @@ int	write_prompt_elem(t_prompt *prompt, char c)
 	else if (c == 'u')
 		ft_putstr_fd((char *)prompt->user, STDOUT_FILENO);
 	else if (c == 'w')
-		ft_putstr_fd(prompt->cwd, STDOUT_FILENO);
+		write_cwd(prompt);
 	else if (c == 'W')
 		ft_putstr_fd((char *)prompt->cwd_basename, STDOUT_FILENO);
 	else if (c == '$')
