@@ -8,6 +8,7 @@
 void	rdl_child(int pipe_fds[2], pid_t pid, t_prompt prompt, int history_fd)
 {
 	char	*ptr;
+	void	*tmp;
 
 	if (is_child(pid))
 	{
@@ -17,7 +18,11 @@ void	rdl_child(int pipe_fds[2], pid_t pid, t_prompt prompt, int history_fd)
 		else
 			ptr = readline(PROMPT);
 		if (ptr && *ptr)
-			ft_putstr_fd(ptr, pipe_fds[1]);
+		{
+			tmp = pass_whitespace(ptr);
+			trim_trailling_ws(tmp);
+			ft_putstr_fd(tmp, pipe_fds[1]);
+		}
 		else if (ptr)
 			ft_putchar_fd(' ', pipe_fds[1]);
 		close(pipe_fds[0]);

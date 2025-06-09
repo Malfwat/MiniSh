@@ -31,6 +31,7 @@ void	print_until(char *str, char c, int fd);
 
 int		ms_get_history_fd(void);
 void	ms_add_history(char *str, int fd, char **ptr_oldcmd);
+void	trim_trailling_ws(char *str);
 
 //Signal
 

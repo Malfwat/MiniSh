@@ -4,6 +4,22 @@
 #include "minishell.h"
 #include <fcntl.h>
 
+void	trim_trailling_ws(char *str)
+{
+	int	i;
+
+	i = ft_strlen(str);
+	if (!i)
+		return ;
+	while (i > 0)
+	{
+		if (str[i - 1] != ' ' && str[i - 1] != '\t')
+			break ;
+		i--;
+	}
+	str[i] = 0;
+}
+
 static bool	fill_history(int fd)
 {
 	char	*str;
@@ -21,6 +37,7 @@ static bool	fill_history(int fd)
 			len = ft_strlen(ptr);
 			if (len >= 1 && ptr[len - 1] == '\n')
 				ptr[len - 1] = 0;
+			trim_trailling_ws(ptr);
 			add_history(ptr);
 		}
 		free(str);
@@ -58,8 +75,10 @@ void	ms_add_history(char *str, int fd, char **ptr_oldcmd)
 	ptr = pass_whitespace(str);
 	if (!*ptr)
 		return ;
+	trim_trailling_ws(ptr);
 	if (ft_strcmp(ptr, *ptr_oldcmd))
 	{
+		ft_printf("history [%s]\n", ptr);
 		add_history(ptr);
 		free(*ptr_oldcmd);
 		*ptr_oldcmd = ft_strdup(ptr);
