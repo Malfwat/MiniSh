@@ -45,5 +45,6 @@ int		new_elem_back(t_buf **begin, char *buf);
 int		in_str(char *str, char c);
 int		free_lst(t_buf **lst);
 size_t	ft_strlcpy(char *dst, const char *src, size_t size);
+void	empty_gnl(int fd);
 
 #endif /*GET_NEXT_LINE_H*/

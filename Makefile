@@ -6,7 +6,7 @@
 #    By: malfwa <admoufle@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/06/09 18:24:33 by malfwa            #+#    #+#              #
-#    Updated: 2025/06/09 18:25:26 by malfwa           ###   ########.fr        #
+#    Updated: 2025/06/09 22:00:22 by malfwa           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,7 +15,8 @@ NAME	=	minishell
 SRC	=	main.c
 
 SRC +=	gnl/get_next_line_utils.c\
-		gnl/get_next_line.c
+		gnl/get_next_line.c\
+		gnl/utils.c
 
 SRC	+=	history/manage_history.c
 

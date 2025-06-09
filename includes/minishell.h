@@ -40,7 +40,7 @@ bool	ms_set_sighandler(void);
 
 //Parsing 
 
-int	get_cmd_line_fd(int	*fd, t_prompt prompt);
+int	get_cmd_line_fd(int	*fd, t_prompt prompt, int history_fd);
 
 //Prompt
 

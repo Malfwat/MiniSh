@@ -50,26 +50,20 @@ bool	expand_prompt(t_prompt *prompt)
 	int		status;
 	int		pipe_fds[2];
 	pid_t	pid;
-	void	*ptr;
 
 	if (pipe(pipe_fds) == -1)
 		return (false);
 	pid = fork();
 	if (pid < 0)
 		return (close(pipe_fds[0]),close(pipe_fds[1]), false);
-	if (is_child(pid))
+	else if (is_child(pid))
 		get_prompt(prompt, pipe_fds);
 	close(pipe_fds[1]);
 	wait(&status);
 	if (get_exit_value(status))
 		return (close(pipe_fds[0]), false);
 	prompt->prompt = get_next_line(pipe_fds[0]);
-	ptr = get_next_line(pipe_fds[0]);
-	while (ptr)
-	{
-		free(ptr);
-		ptr = get_next_line(pipe_fds[0]);
-	}
+	empty_gnl(pipe_fds[0]);
 	close(pipe_fds[0]);
 	return (true);
 }
@@ -89,11 +83,7 @@ char	*ms_gethostname(void)
 	if (ptr_newline)
 		*ptr_newline = 0;
 	tmp = get_next_line(fd);
-	while (tmp)
-	{
-		free(tmp);
-		tmp = get_next_line(fd);
-	}
+	empty_gnl(fd);
 	close(fd);
 	return (hostname);
 }

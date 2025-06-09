@@ -24,7 +24,7 @@ int	main(int ac, char **av, char **env)
 	history_fd = ms_get_history_fd();
 	while (1)
 	{
-		ret_val = get_cmd_line_fd(&fd, prompt_var);
+		ret_val = get_cmd_line_fd(&fd, prompt_var, history_fd);
 		if (ret_val == -1)
 			return (1);
 		str = get_next_line(fd);
