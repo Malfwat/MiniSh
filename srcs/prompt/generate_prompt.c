@@ -73,7 +73,6 @@ char	*ms_gethostname(void)
 	int		fd;
 	char	*hostname;
 	char	*ptr_newline;
-	char	*tmp;
 
 	fd = open(HOSTNAME_FILE, O_RDONLY);
 	if (fd < 0)
@@ -82,7 +81,6 @@ char	*ms_gethostname(void)
 	ptr_newline = ft_strchr(hostname, '\n');
 	if (ptr_newline)
 		*ptr_newline = 0;
-	tmp = get_next_line(fd);
 	empty_gnl(fd);
 	close(fd);
 	return (hostname);
