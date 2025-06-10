@@ -4,7 +4,7 @@
 #include <sys/wait.h>
 #include <fcntl.h>
 
-void	write_cwd(t_prompt *prompt)
+void	write_cwd(t_prompt *prompt, int fd)
 {
 	int		len;
 	char	*home;
@@ -13,27 +13,27 @@ void	write_cwd(t_prompt *prompt)
 	len = ft_strlen(home);
 	if (!ft_strncmp(prompt->cwd, home, len))
 	{
-		ft_putstr_fd("~", STDOUT_FILENO);
-		ft_putstr_fd(prompt->cwd + len, STDOUT_FILENO);
+		ft_putstr_fd("~", fd);
+		ft_putstr_fd(prompt->cwd + len, fd);
 	}
 	else
-		ft_putstr_fd(prompt->cwd, STDOUT_FILENO);
+		ft_putstr_fd(prompt->cwd, fd);
 }
 
-int	write_prompt_elem(t_prompt *prompt, char c)
+int	write_prompt_elem(t_prompt *prompt, char c, int fd)
 {
 	if (c == 'h')
-		print_until(prompt->hostname, '.', STDOUT_FILENO);
+		print_until(prompt->hostname, '.', fd);
 	else if (c == 'H')
-		ft_putstr_fd(prompt->hostname, STDOUT_FILENO);
+		ft_putstr_fd(prompt->hostname, fd);
 	else if (c == 'u')
-		ft_putstr_fd((char *)prompt->user, STDOUT_FILENO);
+		ft_putstr_fd((char *)prompt->user, fd);
 	else if (c == 'w')
-		write_cwd(prompt);
+		write_cwd(prompt, fd);
 	else if (c == 'W')
-		ft_putstr_fd((char *)prompt->cwd_basename, STDOUT_FILENO);
+		ft_putstr_fd((char *)prompt->cwd_basename, fd);
 	else if (c == '$')
-		ft_putchar_fd('$', STDOUT_FILENO);
+		ft_putchar_fd('$', fd);
 	return (1);
 }
 
@@ -42,42 +42,24 @@ void	get_prompt(t_prompt *prompt, int pipe_fds[2])
 	int	i;
 
 	i = 0;
-	if (dup2(pipe_fds[1], STDOUT_FILENO) == -1
-		|| close(pipe_fds[0]) == -1 || close(pipe_fds[1]) == -1)
-	{
-		free(prompt->hostname);
-		exit(1);//manage memory leaks
-	}
 	while (prompt->prompt_raw[i])
 	{
 		if (prompt->prompt_raw[i] == '\\')
-			i += write_prompt_elem(prompt, prompt->prompt_raw[i + 1]);
+			i += write_prompt_elem(prompt, prompt->prompt_raw[i + 1], pipe_fds[1]);
 		else
-			ft_putchar_fd(prompt->prompt_raw[i], STDOUT_FILENO);
+			ft_putchar_fd(prompt->prompt_raw[i], pipe_fds[1]);
 		i++;
 	}
-	free(prompt->hostname);
-	//close(history_fd);
-	exit(0);
 }
 
 bool	expand_prompt(t_prompt *prompt)
 {
-	int		status;
 	int		pipe_fds[2];
-	pid_t	pid;
 
 	if (pipe(pipe_fds) == -1)
 		return (false);
-	pid = fork();
-	if (pid < 0)
-		return (close(pipe_fds[0]),close(pipe_fds[1]), false);
-	else if (is_child(pid))
-		get_prompt(prompt, pipe_fds);
+	get_prompt(prompt, pipe_fds);
 	close(pipe_fds[1]);
-	wait(&status);
-	if (get_exit_value(status))
-		return (close(pipe_fds[0]), false);
 	prompt->prompt = get_next_line(pipe_fds[0]);
 	empty_gnl(pipe_fds[0]);
 	close(pipe_fds[0]);

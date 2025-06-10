@@ -17,7 +17,7 @@ int	main(int ac, char **av, char **env)
 	t_prompt	prompt_var;
 	
 	ft_bzero(&prompt_var, sizeof(t_prompt));
-	prompt_var.prompt_raw = "\e[96m\\u\e[0m@\\h:\\W\\$ ";
+	prompt_var.prompt_raw = "\e[96m\\u\e[0m@\\h:\\w\\$ ";
 	update_prompt_var(&prompt_var);
 	if (!ms_set_sighandler())
 		return (ft_putendl_fd("Error setting signals", 2), 1);
