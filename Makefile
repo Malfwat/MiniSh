@@ -16,6 +16,7 @@ SRC	=	main.c
 
 SRC +=	gnl/get_next_line_utils.c\
 		gnl/get_next_line.c\
+		gnl/gnl.c\
 		gnl/utils.c
 
 SRC	+=	history/manage_history.c

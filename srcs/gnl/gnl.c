@@ -11,6 +11,8 @@
 /* ************************************************************************** */
 
 #include "get_next_line.h"
+#include <stdbool.h>
+#include "minishell.h"
 
 static void	cpy(char **stash, char **line, t_buf *tmp)
 {
@@ -21,12 +23,8 @@ static void	cpy(char **stash, char **line, t_buf *tmp)
 	while (tmp != NULL)
 	{
 		j = 0;
-		while (tmp->str && (tmp->str)[j] && (tmp->str)[j] != '\n')
+		while (tmp->str && (tmp->str)[j])
 			(*line)[i++] = tmp->str[j++];
-		if (tmp->str[j] == '\n')
-			(*line)[i++] = tmp->str[j++];
-		if (tmp->next == NULL)
-			break ;
 		tmp = tmp->next;
 	}
 	(*line)[i] = 0;
@@ -105,7 +103,7 @@ static char	*get_line(int fd, char *stash, char **line, t_buf *lst)
 		if (new_elem_back(&lst, stash) == -1)
 			return (NULL);
 	}
-	while (nb_read > 0 && in_str(stash, '\n') == -1)
+	while (nb_read > 0 || is_opened(stash))
 	{
 		nb_read = read(fd, stash, BUFFER_SIZE);
 		stash[(nb_read >= 0) * nb_read] = 0;
@@ -120,7 +118,7 @@ static char	*get_line(int fd, char *stash, char **line, t_buf *lst)
 	return (join_t_buf(&lst, &stash, line), stash);
 }
 
-char	*get_next_line(int fd)
+char	*gnl(int fd)
 {
 	static char	*stash_tab[4096];
 	char		*line;

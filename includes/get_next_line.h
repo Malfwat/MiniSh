@@ -14,7 +14,7 @@
 # define GET_NEXT_LINE_H
 
 # ifndef BUFFER_SIZE
-#  define BUFFER_SIZE 60
+#  define BUFFER_SIZE 511
 # endif /*BUFFER_SIZE*/
 
 # if (BUFFER_SIZE < 0)
@@ -38,13 +38,14 @@ typedef struct s_stash
 }	t_buf;
 
 char	*get_next_line(int fd);
-char	*get_line(int fd, char *stash, char **line, t_buf *lst);
-int		check_stash(char **stash, char	**line, char *new_stash, int i);
-int		join_t_buf(t_buf **begin, char **stash, char **line);
+//char	*get_line(int fd, char *stash, char **line, t_buf *lst);
+//int		check_stash(char **stash, char	**line, char *new_stash, int i);
+//int		join_t_buf(t_buf **begin, char **stash, char **line);
 int		new_elem_back(t_buf **begin, char *buf);
 int		in_str(char *str, char c);
 int		free_lst(t_buf **lst);
 size_t	ft_strlcpy(char *dst, const char *src, size_t size);
 void	empty_gnl(int fd);
+char	*gnl(int fd);
 
 #endif /*GET_NEXT_LINE_H*/

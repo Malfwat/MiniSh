@@ -2,6 +2,8 @@
 # define MINISHELL_H
 
 # define PROMPT_CHARSET "uhHwW$\\"
+# define SEP "| &<>;"
+# define OPENER "'\"("
 # define HOSTNAME_FILE	"/etc/hostname"
 # define PROMPT "minishell> "
 
@@ -41,10 +43,16 @@ bool	ms_set_sighandler(void);
 
 //Parsing 
 
-int	get_cmd_line_fd(int	*fd, t_prompt prompt, int history_fd);
+int		get_cmd_line_fd(int	*fd, t_prompt prompt, int history_fd);
 
 //Prompt
 
 bool	expand_prompt(t_prompt *prompt);
 bool	update_prompt_var(t_prompt *ptr);
+
+
+
+
+bool	is_opened(char *str);
+
 #endif
