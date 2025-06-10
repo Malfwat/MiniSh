@@ -21,6 +21,20 @@ typedef struct s_prompt
 	char const	*prompt_raw;
 }	t_prompt;
 
+typedef struct s_pair
+{
+	char	*key;
+	int		key_len;
+	char	*value;
+}	t_pair;
+
+# define TABLE_SIZE 512 // Always 2^n to keep the speed
+
+typedef struct s_hash_table
+{
+	t_pair	*bucket[TABLE_SIZE];
+}	t_hash_table;
+
 //Utils
 
 char	*pass_whitespace(char *str);
