@@ -32,14 +32,12 @@ static bool	fill_history(int fd)
 	while (str)
 	{
 		ptr = pass_whitespace(str);
+		len = ft_strlen(ptr);
+		if (len >= 1 && ptr[len - 1] == '\n')
+			ptr[len - 1] = 0;
+		trim_trailling_ws(ptr);
 		if (*ptr)
-		{
-			len = ft_strlen(ptr);
-			if (len >= 1 && ptr[len - 1] == '\n')
-				ptr[len - 1] = 0;
-			trim_trailling_ws(ptr);
 			add_history(ptr);
-		}
 		free(str);
 		str = get_next_line(fd);
 	}
@@ -71,11 +69,15 @@ int	ms_get_history_fd(void)
 void	ms_add_history(char *str, int fd, char **ptr_oldcmd)
 {
 	char	*ptr;
+//	int		len;
 
 	ptr = pass_whitespace(str);
+//	len = ft_strlen(ptr);
+//	if (len >= 1 && ptr[len - 1] == '\n')
+//		ptr[len - 1] = 0;
+	trim_trailling_ws(ptr);
 	if (!*ptr)
 		return ;
-	trim_trailling_ws(ptr);
 	if (ft_strcmp(ptr, *ptr_oldcmd))
 	{
 		ft_printf("history [%s]\n", ptr);

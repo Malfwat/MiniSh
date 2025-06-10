@@ -5,6 +5,53 @@
 #include <stdlib.h>
 #include "minishell.h"
 
+bool	is_opened(char *str)
+{
+	static char quote;
+	static int	bracket;
+
+	if (!str)
+		return (false);
+	while (*str)
+	{
+		if (quote == '\'' && *str == '\'')
+			quote = '\0';
+		else if (quote == '\"' && *str == '\"')
+			quote = '\0';
+		else if (!quote && (*str == '\'' || *str == '\"'))
+			quote = *str;
+		else if (!quote)
+		{
+			if (*str == '(')
+				bracket++;
+			else if (*str == ')')
+				bracket--;
+		}
+		str++;
+	}
+	return (quote || bracket > 0);
+}
+
+void	ms_rdl(char *prompt, int fd)
+{
+	char	*ptr;
+	char	*tmp;
+
+//	ft_putchar_fd('\n', fd);
+	ptr = readline(prompt);
+	if (ptr && *ptr)
+	{
+		tmp = pass_whitespace(ptr);
+		trim_trailling_ws(tmp);
+		ft_putstr_fd(tmp, fd);
+	}
+	else if (ptr)
+		ft_putchar_fd(' ', fd);
+	if (is_opened(ptr))
+		ms_rdl(prompt, fd);
+	free(ptr);
+}
+
 void	rdl_child(int pipe_fds[2], pid_t pid, t_prompt prompt, int history_fd)
 {
 	char	*ptr;
@@ -24,7 +71,11 @@ void	rdl_child(int pipe_fds[2], pid_t pid, t_prompt prompt, int history_fd)
 			ft_putstr_fd(tmp, pipe_fds[1]);
 		}
 		else if (ptr)
-			ft_putchar_fd(' ', pipe_fds[1]);
+			ft_putchar_fd('\n', pipe_fds[1]);
+		if (is_opened(ptr))
+		{
+			ms_rdl("> ", pipe_fds[1]);
+		}
 		close(pipe_fds[0]);
 		close(pipe_fds[1]);
 		close(history_fd);
