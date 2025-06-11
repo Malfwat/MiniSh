@@ -6,7 +6,7 @@ void	remove_pair(t_hash_table *table, t_pair *pair)
 	int		index;
 	t_pair	*tmp;
 
-	index = _hash(pair->key);
+	index = _hash(pair->key, pair->len);
 	if (table->bucket[index] == pair)
 		table->bucket[index] = table->bucket[index]->next;
 	else

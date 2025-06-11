@@ -10,129 +10,122 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
-#include <stdbool.h>
+#include <stdlib.h>
 #include "minishell.h"
+#include "libftprintf.h"
 
-static void	cpy(char **stash, char **line, t_buf *tmp)
+#define BUF_SIZE 511
+
+void	update_opener(char const *str, char *quote_ptr, int *bracket_ptr)
 {
 	int	i;
-	int	j;
 
+	if (!str)
+		return ;
 	i = 0;
-	while (tmp != NULL)
+	while (str[i])
 	{
-		j = 0;
-		while (tmp->str && (tmp->str)[j])
-			(*line)[i++] = tmp->str[j++];
-		tmp = tmp->next;
-	}
-	(*line)[i] = 0;
-	if (tmp && tmp->str[j] != 0)
-		ft_strlcpy(*stash, &(tmp->str)[j], BUFFER_SIZE + 1);
-	else
-	{
-		free(*stash);
-		*stash = NULL;
-	}
-}
-
-static int	join_t_buf(t_buf **begin, char **stash, char **line)
-{
-	t_buf	*tmp;
-	int		i;
-
-	i = 0;
-	tmp = *begin;
-	while (tmp != NULL)
-	{
-		tmp = tmp->next;
-		i++;
-	}
-	tmp = *begin;
-	if (i == 0)
-		return (0);
-	*line = malloc(sizeof(char) * (BUFFER_SIZE * i + 1));
-	if (!*line)
-	{
-		line = NULL;
-		free(*stash);
-		stash = NULL;
-		return (free_lst(begin), -1);
-	}
-	cpy(stash, line, tmp);
-	return (free_lst(begin));
-}
-
-static int	check_stash(char **stash, char	**line, char *new_stash, int i)
-{
-	while (*stash && (*stash)[i] && (*stash)[i] != '\n')
-		i++;
-	if (i == 0 || !(*stash) || (*stash)[i] == 0)
-		return (0);
-	*line = malloc(sizeof(char) * (i + 2));
-	if (!*line)
-		return (free(*stash), -1);
-	ft_strlcpy(*line, *stash, i + 2);
-	if ((*stash)[i + 1] == 0)
-	{
-		free(*stash);
-		*stash = NULL;
-		return (1);
-	}
-	new_stash = malloc(sizeof(char) * (BUFFER_SIZE + 1));
-	if (!new_stash)
-		return (free(*line), free(*stash), -1);
-	ft_strlcpy(new_stash, &((*stash)[i + 1]), BUFFER_SIZE + 1);
-	free(*stash);
-	*stash = new_stash;
-	return (1);
-}
-
-static char	*get_line(int fd, char *stash, char **line, t_buf *lst)
-{
-	int	nb_read;
-
-	nb_read = 1;
-	if (stash[0] != 0)
-	{
-		if (check_stash(&stash, line, NULL, 0) == -1)
-			return (NULL);
-		if (*line)
-			return (stash);
-		if (new_elem_back(&lst, stash) == -1)
-			return (NULL);
-	}
-	while (nb_read > 0 || is_opened(stash))
-	{
-		nb_read = read(fd, stash, BUFFER_SIZE);
-		stash[(nb_read >= 0) * nb_read] = 0;
-		if (nb_read > 0 && new_elem_back(&lst, stash) == -1)
-			return (NULL);
-		if (nb_read <= 0)
+		if (!ft_strchr("\'\"()", str[i]))
+			i++;
+		else if (*quote_ptr)
 		{
-			free(stash);
-			stash = NULL;
+			if (str[i++] == *quote_ptr)
+				*quote_ptr = 0;
 		}
+		else if (str[i++] == '(')
+			(*bracket_ptr)++;
+		else if (str[i++] == ')')
+			(*bracket_ptr)--;
 	}
-	return (join_t_buf(&lst, &stash, line), stash);
+}
+
+char	*join_list(t_list *lst)
+{
+	int		size;
+	char	*line;
+	char	*ptr;
+
+	if (!lst)
+		return (NULL);
+	size = ft_lstsize(lst);
+	line = malloc(sizeof(char) * ((BUF_SIZE + 1) * size));
+	if (!line)
+		return (NULL);
+	ptr = line;
+	while (lst)
+	{
+		ft_strlcpy(ptr, lst->content, BUF_SIZE + 1);
+		ptr += BUF_SIZE;
+		lst = lst->next;
+	}
+	return (line);
+}
+
+static void	update_stash(char *line, char buffer[])
+{
+	int		i;
+	int		bracket;
+	char	quote;
+
+	quote = 0;
+	bracket = 0;
+	i = 0;
+	while (line[i])
+	{
+		if (line[i] == '\n' && !quote && !bracket)
+			break ;
+		if (line[i] == '\'' || line[i] == '\"')
+		{
+			if (!quote)
+				quote = line[i];
+			else if (quote == line[i])
+					quote = 0;
+		}
+		else if (!quote && (line[i] == '(' || line[i] == ')'))
+			bracket += (int []){1, -1}[line[i] == ')'];
+		i++;
+	}
+	if (line[i] == '\n')
+	{
+		i++;
+		ft_strlcpy(buffer, line + i, BUF_SIZE + 1);
+		line[i] = 0;
+	}
+	else
+		buffer[0] = 0;
 }
 
 char	*gnl(int fd)
 {
-	static char	*stash_tab[4096];
-	char		*line;
+	static char	buffer[BUF_SIZE + 1];
+	char	quote;
+	int		bracket;
+	int		nb_bytes;
+	t_list	*head;
+	t_list	*new;
+	char	*str;
 
-	line = NULL;
-	if (BUFFER_SIZE <= 0 || fd >= 4096 || fd < 0 || BUFFER_SIZE > INT_MAX - 1)
+	if (fd < 0)
 		return (NULL);
-	if (!stash_tab[fd])
+	quote = 0;
+	bracket = 0;
+	head = NULL;
+	nb_bytes = 1;
+	while (nb_bytes > 0  && (!ft_strchr(buffer, '\n') || quote || bracket))
 	{
-		stash_tab[fd] = malloc(sizeof(char) * (BUFFER_SIZE + 1));
-		if (!stash_tab[fd])
+		nb_bytes = read(fd, buffer, BUF_SIZE);
+		if (nb_bytes < 0 || (!buffer[0] && !nb_bytes && !head))
 			return (NULL);
-		stash_tab[fd][0] = 0;
+		buffer[nb_bytes] = 0;
+		str = ft_strdup(buffer);
+		if (!str)
+			return (ft_lstclear(&head, free), NULL);
+		new = ft_lstnew(str);
+		ft_lstadd_back(&head, new);
+		update_opener(str, &quote, &bracket);
 	}
-	stash_tab[fd] = get_line(fd, stash_tab[fd], &line, NULL);
-	return (line);
+	str = join_list(head);
+	if (str)
+		update_stash(str, buffer);
+	return (ft_lstclear(&head, free), str);
 }

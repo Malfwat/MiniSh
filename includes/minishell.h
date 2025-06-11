@@ -23,6 +23,7 @@ typedef struct s_prompt
 
 typedef struct s_pair
 {
+	int				len;
 	char			*key;
 	char			*value;
 	struct s_pair	*next;
@@ -60,8 +61,8 @@ bool	ms_set_sighandler(void);
 int		get_cmd_line_fd(int	*fd, t_prompt prompt, int history_fd);
 
 void	free_table(t_hash_table *table);
-int		_hash(char *key);
-t_pair	*get_pair(t_hash_table *table, char *key);
+int		_hash(char *key, int len);
+t_pair	*get_pair(t_hash_table *table, char *key, int len);
 void	insert_pair(t_hash_table *table, t_pair *pair);
 void	set_pair(t_hash_table *table, t_pair *pair);
 t_pair	*create_pair(char *str);

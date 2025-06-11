@@ -1,10 +1,4 @@
 
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/06/10 19:05:47 by malfwa            #+#    #+#             */
-/*   Updated: 2025/06/10 20:16:42 by malfwa           ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include <stdlib.h>
 #include <readline/history.h>
 #include <readline/readline.h>
@@ -83,9 +77,10 @@ int	word_len(char *str)
 	return (i);
 }
 
-void	lexer(char *str)
+void	lexer(char *str, t_hash_table *table)
 {
 	int	len;
+	t_pair	*pair;
 
 	if (!str)
 		return ;
@@ -94,6 +89,9 @@ void	lexer(char *str)
 		len = word_len(str);
 		ft_printf("-%i-word:", len);
 		write(STDOUT_FILENO, str, len);
+		pair = get_pair(table, str, len);
+		if (pair)
+			ft_printf(" est un alias de %s\n", pair->value);
 		ft_putendl_fd("", STDOUT_FILENO);
 		str += len;
 		str = pass_whitespace(str);
@@ -110,7 +108,11 @@ int	main(int ac, char **av, char **env)
 	int			history_fd;
 	int			ret_val;
 	t_prompt	prompt_var;
-	
+	t_hash_table table;
+
+	ft_bzero(&table, sizeof(table));
+	void *pair = create_pair(ft_strdup("test=yeah"));
+	set_pair(&table, pair);
 	ft_bzero(&prompt_var, sizeof(t_prompt));
 	prompt_var.prompt_raw = "\\u@\\h:\\w\\$ ";
 	//prompt_var.prompt_raw = "\e[96m\\u\e[0m@\\h:\\w\\$ ";
@@ -133,11 +135,12 @@ int	main(int ac, char **av, char **env)
 			ms_add_history(str, history_fd, &prev_cmdline);
 			if (!prev_cmdline)
 				ft_putstr_fd("Error saving prev_cmdline\n", 2);
-			lexer(str);
+			lexer(str, &table);
 		}
 		free(str);
 		str = NULL;
 	}
+	free_table(&table);
 	close(history_fd);
 	free(prev_cmdline);
 	free(prompt_var.prompt);

@@ -39,7 +39,7 @@ static bool	fill_history(int fd)
 		if (*ptr)
 			add_history(ptr);
 		free(str);
-		str = gnl(fd);
+		str = get_next_line(fd);
 	}
 	return (true);
 }
