@@ -1,9 +1,4 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: malfwa <admoufle@student.42.fr>            +#+  +:+       +#+        */
+
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/10 19:05:47 by malfwa            #+#    #+#             */
 /*   Updated: 2025/06/10 20:16:42 by malfwa           ###   ########.fr       */
@@ -76,7 +71,6 @@ int	closing_match(char *ptr)
 int	word_len(char *str)
 {
 	int		i;
-//	char	opener; 
 	i = 0;
 	while (str[i])
 	{
@@ -85,9 +79,6 @@ int	word_len(char *str)
 		if (!str[i] || ft_strchr(SEP, str[i]))
 			return (i);
 		i += closing_match(str + i) + 1;
-//		ft_printf("%i\n", closing_match(str + i));
-//		exit(1);
-//		return (i);
 	}
 	return (i);
 }
