@@ -23,9 +23,9 @@ typedef struct s_prompt
 
 typedef struct s_pair
 {
-	char	*key;
-	int		key_len;
-	char	*value;
+	char			*key;
+	char			*value;
+	struct s_pair	*next;
 }	t_pair;
 
 # define TABLE_SIZE 512 // Always 2^n to keep the speed
@@ -58,6 +58,14 @@ bool	ms_set_sighandler(void);
 //Parsing 
 
 int		get_cmd_line_fd(int	*fd, t_prompt prompt, int history_fd);
+
+void	free_table(t_hash_table *table);
+int		_hash(char *key);
+t_pair	*get_pair(t_hash_table *table, char *key);
+void	insert_pair(t_hash_table *table, t_pair *pair);
+void	set_pair(t_hash_table *table, t_pair *pair);
+t_pair	*create_pair(char *str);
+void	remove_pair(t_hash_table *table, t_pair *pair);
 
 //Prompt
 

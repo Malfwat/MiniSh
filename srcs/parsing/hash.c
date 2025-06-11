@@ -4,7 +4,7 @@
 
 #define PRIME 53
 
-int	_hash(char *key, int len)
+int	_hash(char *key)
 {
 	int			i;
 	uint64_t	hash_val;
@@ -13,7 +13,7 @@ int	_hash(char *key, int len)
 	hash_val = 0;
 	if (!key)
 		return (0);
-	while (key[i] && i < len)
+	while (key[i])
 	{
 		hash_val = hash_val * PRIME + key[i];
 		i++;
@@ -21,23 +21,16 @@ int	_hash(char *key, int len)
 	return (hash_val & (TABLE_SIZE - 1));
 }
 
-t_pair	*get_last(t_pair *lst)
+t_pair	*get_pair(t_hash_table *table, char *key)
 {
-	while (lst->next)
-		lst = lst->next;
-	return (lst);
-}
-
-t_pair	*get_pair(t_hash_table *table, char *key, int key_len)
-{
-	int	index;
+	int		index;
 	t_pair	*tmp;
 
 	if (!key)
 		return (NULL);
-	index = _hash(key, key_len);
+	index = _hash(key);
 	tmp = table->bucket[index];
-	while (tmp && ft_strncmp(tmp->key, key, key_len))
+	while (tmp && ft_strcmp(tmp->key, key))
 		tmp = tmp->next;
 	return (tmp);
 }
@@ -45,35 +38,40 @@ t_pair	*get_pair(t_hash_table *table, char *key, int key_len)
 void	insert_pair(t_hash_table *table, t_pair *pair)
 {
 	int		index;
-	t_pair	*tmp;
 
 	if (!pair)
 		return ;
-	index = _hash(pair->key, pair->key_len);
+	index = _hash(pair->key);
 	if (table->bucket[index])
-		get_last(table->bucket[index])->next = pair;
+		pair->next = table->bucket[index];
 	else
 		table->bucket[index] = pair;
 }
-
-void	remove_pair(t_hash_table *table, t_pair *pair)
-{}
 
 void	set_pair(t_hash_table *table, t_pair *pair)
 {
 	t_pair	*previous;
 
-	previous = get_pair(table, pair->key, pair->key_len);
+	previous = get_pair(table, pair->key);
 	if (previous)
-	{
-		free(p)
-	}
+		remove_pair(table, previous);
+	insert_pair(table, pair);
 }
 
-int	main(void)
+t_pair	*create_pair(char *str)
 {
-	t_hash_table	table;
+	t_pair	*pair;
+	char	*ptr;
 
-	ft_bzero(&table, sizeof(table));
-
+	if (!str || !ft_strchr(str, '='))
+		return (NULL);
+	pair = malloc(sizeof(t_pair));
+	if (!pair)
+		return (NULL);
+	pair->next = NULL;
+	pair->key = str;
+	ptr = ft_strchr(str, '=');
+	pair->value = ptr + 1;
+	*ptr = 0;
+	return (pair);
 }

@@ -25,7 +25,9 @@ SRC	+=	signal/handler.c
 
 SRC	+=	utils/utils.c
 
-SRC	+=	parsing/readline.c
+SRC	+=	parsing/readline.c\
+		parsing/hash.c\
+		parsing/hash_utils.c
 
 SRC	+=	prompt/generate_prompt.c
 

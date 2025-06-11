@@ -52,10 +52,8 @@ int	find_closing_bracket(char *opening_bracket)
 {
 	char	*ptr;
 	int		i;
-	int		nb_opened;
 
 	ptr = opening_bracket;
-	nb_opened = 1;
 	i = 1;
 	while (ptr[i] && ptr[i] != ')')
 	{
@@ -70,9 +68,6 @@ int	find_closing_bracket(char *opening_bracket)
 
 int	closing_match(char *ptr)
 {
-	int	i;
-
-	i = 0;
 	if (*ptr == '\'' || *ptr == '"')
 		return (ft_strchr(ptr + 1, *ptr) - ptr);
 	return (find_closing_bracket(ptr));
