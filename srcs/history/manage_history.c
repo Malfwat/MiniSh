@@ -43,8 +43,6 @@ static bool	fill_history(int fd)
 		free(str);
 		str = gnl(fd);
 	}
-	write(1, "\n", 1);
-	//exit(1);
 	return (true);
 }
 

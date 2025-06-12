@@ -17,6 +17,7 @@ SRC	=	main.c
 SRC +=	gnl/get_next_line_utils.c\
 		gnl/get_next_line.c\
 		gnl/gnl.c\
+		gnl/gnl_utils.c\
 		gnl/utils.c
 
 SRC	+=	history/manage_history.c
@@ -29,7 +30,8 @@ SRC	+=	parsing/readline.c\
 		parsing/hash.c\
 		parsing/hash_utils.c
 
-SRC	+=	prompt/generate_prompt.c
+SRC	+=	prompt/generate_prompt.c\
+		prompt/write_prompt.c
 
 CC	=	cc
 

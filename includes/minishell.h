@@ -12,6 +12,7 @@
 # include <stdbool.h>
 # include <limits.h>
 # include <unistd.h>
+# include "libftprintf.h"
 
 typedef struct s_prompt
 {
@@ -74,9 +75,13 @@ void	remove_pair(t_hash_table *table, t_pair *pair);
 
 bool	expand_prompt(t_prompt *prompt);
 bool	update_prompt_var(t_prompt *ptr);
+void	get_prompt(t_prompt *prompt, int pipe_fds[2]);
 
+//gnl_utils
 
-
+bool	add_in_list(char buffer[], t_list **head);
+int		read_null_terminated(int fd, char *buffer, int buffer_size);
+bool	closed_word(char const buffer[], char *quote_ptr, int *bracket_ptr);
 
 bool	is_opened(char *str);
 

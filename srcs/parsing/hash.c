@@ -52,6 +52,8 @@ void	set_pair(t_hash_table *table, t_pair *pair)
 {
 	t_pair	*previous;
 
+	if (!pair)
+		return ;
 	previous = get_pair(table, pair->key, pair->len);
 	if (previous)
 		remove_pair(table, previous);

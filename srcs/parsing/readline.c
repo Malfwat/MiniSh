@@ -48,15 +48,11 @@ void	rdl_child(int pipe_fds[2], pid_t pid, t_prompt prompt, int history_fd)
 		else if (ptr)
 			ft_putchar_fd(' ', pipe_fds[1]);
 		if (is_opened(ptr))
-		{
 			ms_rdl("> ", pipe_fds[1]);
-		}
 		close(pipe_fds[0]);
 		close(pipe_fds[1]);
 		close(history_fd);
-		free(ptr);
-		free(prompt.prompt);
-		exit(0);
+		return (free(ptr), free(prompt.prompt), exit(0));
 	}
 }
 

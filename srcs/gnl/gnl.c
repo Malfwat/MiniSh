@@ -14,33 +14,6 @@
 #include "minishell.h"
 #include "libftprintf.h"
 
-bool	closed_word(char const *str, char *quote_ptr, int *bracket_ptr)
-{
-	int	i;
-
-	if (!str)
-		return (false);
-	i = 0;
-	while (str[i] /*&& !ft_strchr("\'\"()", str[i])*/)
-	{
-		if (*quote_ptr)
-		{
-			if (str[i] == *quote_ptr)
-				*quote_ptr = 0;
-		}
-		else if (!*quote_ptr && (str[i] == '\'' || str[i] == '\"'))
-			*quote_ptr = str[i];
-		else if (!*quote_ptr && str[i] == '(')
-			(*bracket_ptr)++;
-		else if (!*quote_ptr && str[i] == ')')
-			(*bracket_ptr)--;
-		else if (str[i] == '\n' && !*quote_ptr && !*bracket_ptr)
-			return (true);
-		i++;
-	}
-	return (false);
-}
-
 char	*join_list(t_list *lst)
 {
 	int		size;
@@ -63,6 +36,18 @@ char	*join_list(t_list *lst)
 	return (line);
 }
 
+void	rewrite_buffer(char buffer[], char *line, int pos_in_line)
+{
+	if (line[pos_in_line] == '\n')
+	{
+		pos_in_line++;
+		ft_strlcpy(buffer, line + pos_in_line, BUF_SIZE + 1);
+		line[pos_in_line] = 0;
+	}
+	else
+		buffer[0] = 0;
+}
+
 static void	update_stash(char *line, char buffer[])
 {
 	int		i;
@@ -72,40 +57,41 @@ static void	update_stash(char *line, char buffer[])
 	quote = 0;
 	bracket = 0;
 	i = 0;
-	while (line[i])
+	if (!line)
+		return ;
+	while (line[i] && !(line[i] == '\n' && !quote && !bracket))
 	{
-		if (line[i] == '\n' && !quote && !bracket)
-			break ;
-		if (line[i] == '\'' || line[i] == '\"')
+		if (quote && quote == line[i])
+			quote = 0;
+		else if (!quote)
 		{
-			if (!quote)
+			if (line[i] == '\'' || line[i] == '\"')
 				quote = line[i];
-			else if (quote == line[i])
-					quote = 0;
+			else if (line[i] == '(' || line[i] == ')')
+				bracket += (int []){1, -1}[line[i] == ')'];
 		}
-		else if (!quote && (line[i] == '(' || line[i] == ')'))
-			bracket += (int []){1, -1}[line[i] == ')'];
 		i++;
 	}
-	if (line[i] == '\n')
-	{
-		i++;
-		ft_strlcpy(buffer, line + i, BUF_SIZE + 1);
-		line[i] = 0;
-	}
-	else
-		buffer[0] = 0;
+	rewrite_buffer(buffer, line, i);
+}
+
+char	*concate_and_update_stash(char buffer[], t_list **head)
+{
+	char	*str;
+
+	str = join_list(*head);
+	update_stash(str, buffer);
+	ft_lstclear(head, free);
+	return (str);
 }
 
 char	*gnl(int fd)
 {
 	static char	buffer[BUF_SIZE + 1];
-	char	quote;
-	int		bracket;
-	int		nb_bytes;
-	t_list	*head;
-	t_list	*new;
-	char	*str;
+	char		quote;
+	int			bracket;
+	int			nb_bytes;
+	t_list		*head;
 
 	if (fd < 0)
 		return (NULL);
@@ -113,32 +99,15 @@ char	*gnl(int fd)
 	bracket = 0;
 	head = NULL;
 	nb_bytes = 1;
-	if (buffer[0])
-	{
-		str = ft_strdup(buffer);
-		if (!str)
-			return (ft_lstclear(&head, free), NULL);
-		new = ft_lstnew(str);
-		if (!new)
-			return (ft_lstclear(&head, free), NULL);
-		ft_lstadd_back(&head, new);
-	}
+	if (buffer[0] && !add_in_list(buffer, &head))
+		return (NULL);
 	while (nb_bytes > 0 && !closed_word(buffer, &quote, &bracket))
 	{
-		nb_bytes = read(fd, buffer, BUF_SIZE);
+		nb_bytes = read_null_terminated(fd, buffer, BUF_SIZE);
 		if (nb_bytes < 0 || (!buffer[0] && !nb_bytes && !head))
+			return (ft_lstclear(&head, free), NULL);
+		if (!add_in_list(buffer, &head))
 			return (NULL);
-		buffer[nb_bytes] = 0;
-		str = ft_strdup(buffer);
-		if (!str)
-			return (ft_lstclear(&head, free), NULL);
-		new = ft_lstnew(str);
-		if (!new)
-			return (ft_lstclear(&head, free), NULL);
-		ft_lstadd_back(&head, new);
 	}
-	str = join_list(head);
-	if (str)
-		update_stash(str, buffer);
-	return (ft_lstclear(&head, free), str);
+	return (concate_and_update_stash(buffer, &head));
 }
