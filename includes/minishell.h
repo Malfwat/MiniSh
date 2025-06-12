@@ -7,6 +7,10 @@
 # define HOSTNAME_FILE	"/etc/hostname"
 # define PROMPT "minishell> "
 # define MS_HISTORY ".ms_history"
+# define MS_RC ".minishellrc"
+# define ALIAS "alias"
+# define ALIAS_LEN 5
+# define FORBIDDEN_CHAR_ALIAS " -./!@#$*&():"
 # define BUF_SIZE 511
 
 # include <stdbool.h>
@@ -63,10 +67,10 @@ bool	ms_set_sighandler(void);
 
 int		get_cmd_line_fd(int	*fd, t_prompt prompt, int history_fd);
 
+void	parse_rc(t_hash_table *table);
 void	free_table(t_hash_table *table);
 int		_hash(char *key, int len);
 t_pair	*get_pair(t_hash_table *table, char *key, int len);
-void	insert_pair(t_hash_table *table, t_pair *pair);
 void	set_pair(t_hash_table *table, t_pair *pair);
 t_pair	*create_pair(char *str);
 void	remove_pair(t_hash_table *table, t_pair *pair);

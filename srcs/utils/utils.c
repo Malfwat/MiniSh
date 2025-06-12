@@ -1,6 +1,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include "libft.h"
 
 void	print_until(char *str, char c, int fd)
 {
@@ -33,7 +34,7 @@ char	*pass_whitespace(char *str)
 {
 	if (!str)
 		return (NULL);
-	while (*str == ' ' || *str == '\t')
+	while (is_white_space(*str))
 		str++;
 	return (str);
 }

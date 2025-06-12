@@ -1,0 +1,71 @@
+#include "minishell.h"
+#include "get_next_line.h"
+
+bool	get_fd(int *fd)
+{
+	char	*tmp;
+
+	tmp = getenv("HOME");
+	if (!tmp)
+		return (false);
+	tmp = ft_strsjoin((char *[]){tmp, "/", MS_RC, NULL});
+	if (!tmp)
+		return (false);
+	*fd = open(tmp, O_RDONLY);
+	free(tmp);
+	if (*fd < 0)
+		return (false);
+	return (true);
+}
+
+bool	check_alias_chars(char *str)
+{
+	int	i;
+
+	i = 0;
+	while (str[i] && str[i] != '=')
+	{
+		if (!ft_isalnum(str[i]) && str[i] != '_')
+			return (false);
+		i++;
+	}
+	if (str[i] != '=' || !closed_word(str + i + 1, 0, 0))
+		return (false);
+	return (true);
+}
+
+bool	is_alias_cmd(char *str, char **ptr)
+{
+	if (ft_strncmp(str, ALIAS, ALIAS_LEN))
+		return (false);
+	str += ALIAS_LEN;
+	str = pass_whitespace(str);
+	if (ft_isdigit(*str))
+		return (false);
+	*ptr = ft_strdup(str);
+	if (!*ptr)
+		return (false);
+	return (true);
+}
+
+void	parse_rc(t_hash_table *table)
+{
+	char	*str;
+	char	*ptr;
+	t_pair	*new;
+	int		fd;
+
+	if (!table || !get_fd(&fd))
+		return ;
+	str = get_next_line(fd);
+	while (str)
+	{
+		if (is_alias_cmd(str, &ptr))
+		{
+			new = create_pair(ptr);
+			set_pair(table, new);
+		}
+		free(str);
+		str = get_next_line(fd);
+	}
+}

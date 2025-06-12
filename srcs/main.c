@@ -121,9 +121,7 @@ int	main(int ac, char **av, char **env)
 
 	// Creating hash table and aliases
 	ft_bzero(&table, sizeof(table));
-	void *pair = create_pair(ft_strdup("test=yeah"));
-	set_pair(&table, pair);
-
+	parse_rc(&table);
 
 	// Initializing Prompt
 	ft_bzero(&prompt_var, sizeof(t_prompt));
