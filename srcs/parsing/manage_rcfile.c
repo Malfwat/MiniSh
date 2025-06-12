@@ -18,6 +18,36 @@ bool	get_fd(int *fd)
 	return (true);
 }
 
+bool	alias_open(char *str)
+{
+	char quote;
+	int	bracket;
+
+	quote = 0;
+	bracket = 0;
+
+	if (!str)
+		return (false);
+	while (*str)
+	{
+		if (quote == '\'' && *str == '\'')
+			quote = '\0';
+		else if (quote == '\"' && *str == '\"')
+			quote = '\0';
+		else if (!quote && (*str == '\'' || *str == '\"'))
+			quote = *str;
+		else if (!quote)
+		{
+			if (*str == '(')
+				bracket++;
+			else if (*str == ')')
+				bracket--;
+		}
+		str++;
+	}
+	return (quote || bracket > 0);
+}
+
 bool	check_alias_chars(char *str)
 {
 	int	i;
@@ -29,10 +59,12 @@ bool	check_alias_chars(char *str)
 			return (false);
 		i++;
 	}
-	if (str[i] != '=' || !closed_word(str + i + 1, 0, 0))
+	if (str[i] != '=' || alias_open(str + i + 1))
 		return (false);
 	return (true);
 }
+
+
 
 bool	is_alias_cmd(char *str, char **ptr)
 {
@@ -40,7 +72,7 @@ bool	is_alias_cmd(char *str, char **ptr)
 		return (false);
 	str += ALIAS_LEN;
 	str = pass_whitespace(str);
-	if (ft_isdigit(*str))
+	if (ft_isdigit(*str) || !check_alias_chars(str))
 		return (false);
 	*ptr = ft_strdup(str);
 	if (!*ptr)
@@ -48,11 +80,23 @@ bool	is_alias_cmd(char *str, char **ptr)
 	return (true);
 }
 
+void	alias(t_hash_table *table, char *str)
+{
+	char	*ptr;
+	t_pair	*new;
+	
+	if (is_alias_cmd(str, &ptr))
+	{
+		new = create_pair(ptr);
+		if (!new)
+			return ;
+		set_pair(table, new);
+	}
+}
+
 void	parse_rc(t_hash_table *table)
 {
 	char	*str;
-	char	*ptr;
-	t_pair	*new;
 	int		fd;
 
 	if (!table || !get_fd(&fd))
@@ -60,11 +104,7 @@ void	parse_rc(t_hash_table *table)
 	str = get_next_line(fd);
 	while (str)
 	{
-		if (is_alias_cmd(str, &ptr))
-		{
-			new = create_pair(ptr);
-			set_pair(table, new);
-		}
+		alias(table, str);
 		free(str);
 		str = get_next_line(fd);
 	}
