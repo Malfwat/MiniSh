@@ -30,7 +30,6 @@ bool	is_opened(char *str)
 		}
 		str++;
 	}
-	ft_printf("quote:[%c]\tbracket:[%i]\n", quote, bracket);
 	return (quote || bracket > 0);
 }
 
@@ -115,7 +114,6 @@ int	main(int ac, char **av, char **env)
 	set_pair(&table, pair);
 	ft_bzero(&prompt_var, sizeof(t_prompt));
 	prompt_var.prompt_raw = "\\u@\\h:\\w\\$ ";
-	//prompt_var.prompt_raw = "\e[96m\\u\e[0m@\\h:\\w\\$ ";
 	update_prompt_var(&prompt_var);
 	if (!ms_set_sighandler())
 		return (ft_putendl_fd("Error setting signals", 2), 1);
@@ -126,7 +124,6 @@ int	main(int ac, char **av, char **env)
 		if (ret_val == -1)
 			return (1);
 		str = gnl(fd);
-		ft_printf("\n\nThis is str: [%s]\n\n", str);
 		close(fd);
 		if (!str)
 			break ;

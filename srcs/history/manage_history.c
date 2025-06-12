@@ -28,7 +28,7 @@ static bool	fill_history(int fd)
 
 	if (fd < 0)
 		return (false);
-	str = get_next_line(fd);
+	str = gnl(fd);
 	while (str)
 	{
 		ptr = pass_whitespace(str);
@@ -37,10 +37,14 @@ static bool	fill_history(int fd)
 			ptr[len - 1] = 0;
 		trim_trailling_ws(ptr);
 		if (*ptr)
+		{
 			add_history(ptr);
+		}
 		free(str);
-		str = get_next_line(fd);
+		str = gnl(fd);
 	}
+	write(1, "\n", 1);
+	//exit(1);
 	return (true);
 }
 
@@ -54,7 +58,7 @@ int	ms_get_history_fd(void)
 		tmp = getenv("HOME");
 		if (!tmp)
 			return (-1);
-		tmp = ft_strsjoin((char *[]){tmp, "/", ".ms_history", NULL});
+		tmp = ft_strsjoin((char *[]){tmp, "/", MS_HISTORY, NULL});
 		if (!tmp)
 			return (-1);
 		fd = open(tmp, O_RDWR | O_CREAT | O_APPEND, 00666);
@@ -69,18 +73,13 @@ int	ms_get_history_fd(void)
 void	ms_add_history(char *str, int fd, char **ptr_oldcmd)
 {
 	char	*ptr;
-//	int		len;
 
 	ptr = pass_whitespace(str);
-//	len = ft_strlen(ptr);
-//	if (len >= 1 && ptr[len - 1] == '\n')
-//		ptr[len - 1] = 0;
 	trim_trailling_ws(ptr);
 	if (!*ptr)
 		return ;
 	if (ft_strcmp(ptr, *ptr_oldcmd))
 	{
-		ft_printf("history [%s]\n", ptr);
 		add_history(ptr);
 		free(*ptr_oldcmd);
 		*ptr_oldcmd = ft_strdup(ptr);

@@ -14,29 +14,31 @@
 #include "minishell.h"
 #include "libftprintf.h"
 
-#define BUF_SIZE 511
-
-void	update_opener(char const *str, char *quote_ptr, int *bracket_ptr)
+bool	closed_word(char const *str, char *quote_ptr, int *bracket_ptr)
 {
 	int	i;
 
 	if (!str)
-		return ;
+		return (false);
 	i = 0;
-	while (str[i])
+	while (str[i] /*&& !ft_strchr("\'\"()", str[i])*/)
 	{
-		if (!ft_strchr("\'\"()", str[i]))
-			i++;
-		else if (*quote_ptr)
+		if (*quote_ptr)
 		{
-			if (str[i++] == *quote_ptr)
+			if (str[i] == *quote_ptr)
 				*quote_ptr = 0;
 		}
-		else if (str[i++] == '(')
+		else if (!*quote_ptr && (str[i] == '\'' || str[i] == '\"'))
+			*quote_ptr = str[i];
+		else if (!*quote_ptr && str[i] == '(')
 			(*bracket_ptr)++;
-		else if (str[i++] == ')')
+		else if (!*quote_ptr && str[i] == ')')
 			(*bracket_ptr)--;
+		else if (str[i] == '\n' && !*quote_ptr && !*bracket_ptr)
+			return (true);
+		i++;
 	}
+	return (false);
 }
 
 char	*join_list(t_list *lst)
@@ -55,7 +57,7 @@ char	*join_list(t_list *lst)
 	while (lst)
 	{
 		ft_strlcpy(ptr, lst->content, BUF_SIZE + 1);
-		ptr += BUF_SIZE;
+		ptr += ft_strlen(lst->content);
 		lst = lst->next;
 	}
 	return (line);
@@ -111,7 +113,17 @@ char	*gnl(int fd)
 	bracket = 0;
 	head = NULL;
 	nb_bytes = 1;
-	while (nb_bytes > 0  && (!ft_strchr(buffer, '\n') || quote || bracket))
+	if (buffer[0])
+	{
+		str = ft_strdup(buffer);
+		if (!str)
+			return (ft_lstclear(&head, free), NULL);
+		new = ft_lstnew(str);
+		if (!new)
+			return (ft_lstclear(&head, free), NULL);
+		ft_lstadd_back(&head, new);
+	}
+	while (nb_bytes > 0 && !closed_word(buffer, &quote, &bracket))
 	{
 		nb_bytes = read(fd, buffer, BUF_SIZE);
 		if (nb_bytes < 0 || (!buffer[0] && !nb_bytes && !head))
@@ -121,8 +133,9 @@ char	*gnl(int fd)
 		if (!str)
 			return (ft_lstclear(&head, free), NULL);
 		new = ft_lstnew(str);
+		if (!new)
+			return (ft_lstclear(&head, free), NULL);
 		ft_lstadd_back(&head, new);
-		update_opener(str, &quote, &bracket);
 	}
 	str = join_list(head);
 	if (str)

@@ -6,6 +6,8 @@
 # define OPENER "'\"("
 # define HOSTNAME_FILE	"/etc/hostname"
 # define PROMPT "minishell> "
+# define MS_HISTORY ".ms_history"
+# define BUF_SIZE 511
 
 # include <stdbool.h>
 # include <limits.h>
