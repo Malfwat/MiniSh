@@ -78,23 +78,32 @@ int	word_len(char *str)
 
 void	lexer(char *str, t_hash_table *table)
 {
-	int	len;
+	bool	count;
+	int		len;
 	t_pair	*pair;
 
 	if (!str)
 		return ;
+	count = false;
 	while (*str)
 	{
 		len = word_len(str);
-		ft_printf("-%i-word:", len);
-		write(STDOUT_FILENO, str, len);
-		pair = get_pair(table, str, len);
-		if (pair)
-			ft_printf(" est un alias de %s\n", pair->value);
-		ft_putendl_fd("", STDOUT_FILENO);
+		if (!count)
+		{
+			count = true;
+			pair = get_pair(table, str, len);
+			if (pair)
+				ft_putstr(pair->value);
+			else
+				write(STDOUT_FILENO, str, len);
+		}
+		else
+			write(STDOUT_FILENO, str, len);
+		ft_putchar_fd(' ', STDOUT_FILENO);
 		str += len;
 		str = pass_whitespace(str);
 	}
+	write(1, "\n", 1);
 }
 
 int	main(int ac, char **av, char **env)
@@ -109,20 +118,32 @@ int	main(int ac, char **av, char **env)
 	t_prompt	prompt_var;
 	t_hash_table table;
 
+
+	// Creating hash table and aliases
 	ft_bzero(&table, sizeof(table));
 	void *pair = create_pair(ft_strdup("test=yeah"));
 	set_pair(&table, pair);
+
+
+	// Initializing Prompt
 	ft_bzero(&prompt_var, sizeof(t_prompt));
 	prompt_var.prompt_raw = "\\u@\\h:\\w\\$ ";
 	update_prompt_var(&prompt_var);
+
+
+	// Setting signals
 	if (!ms_set_sighandler())
 		return (ft_putendl_fd("Error setting signals", 2), 1);
+
+	// Getting .ms_history fd
 	history_fd = ms_get_history_fd();
+
+	// Main loop
 	while (1)
 	{
 		ret_val = get_cmd_line_fd(&fd, prompt_var, history_fd);
 		if (ret_val == -1)
-			return (1);
+			break ;
 		str = gnl(fd);
 		close(fd);
 		if (!str)
@@ -137,11 +158,14 @@ int	main(int ac, char **av, char **env)
 		free(str);
 		str = NULL;
 	}
+
+	// Freeing everything 
 	free_table(&table);
 	close(history_fd);
 	free(prev_cmdline);
 	free(prompt_var.prompt);
 	free(prompt_var.hostname);
+	clear_history();
 	rl_clear_history();
 	return (0);
 }
