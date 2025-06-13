@@ -6,7 +6,7 @@
 #    By: malfwa <admoufle@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/06/09 18:24:33 by malfwa            #+#    #+#              #
-#    Updated: 2025/06/09 22:00:22 by malfwa           ###   ########.fr        #
+#    Updated: 2025/06/13 21:02:02 by malfwa           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -29,6 +29,7 @@ SRC	+=	utils/utils.c
 SRC	+=	parsing/readline.c\
 		parsing/hash.c\
 		parsing/manage_rcfile.c\
+		parsing/snippet.c\
 		parsing/hash_utils.c
 
 SRC	+=	prompt/generate_prompt.c\

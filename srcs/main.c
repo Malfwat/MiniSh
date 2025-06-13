@@ -99,7 +99,7 @@ void	lexer(char *str, t_hash_table *table)
 		}
 		else
 			write(STDOUT_FILENO, str, len);
-		ft_putchar_fd(' ', STDOUT_FILENO);
+		ft_putchar_fd('\n', STDOUT_FILENO);
 		str += len;
 		str = pass_whitespace(str);
 	}

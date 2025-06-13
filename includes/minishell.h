@@ -36,12 +36,41 @@ typedef struct s_pair
 	struct s_pair	*next;
 }	t_pair;
 
+enum e_token
+{
+	word,
+	redir_in,
+	redir_out,
+	here_doc,
+	append,
+	pipe_delim,
+	or,
+	and,
+	semicolon,
+	open_par,
+	closing_par
+};
+
+typedef struct s_node
+{
+	enum e_token	token;
+	char			*ptr;
+	struct s_node	*next;
+}	t_snippet;
+
 # define TABLE_SIZE 512 // Always 2^n to keep the speed
 
 typedef struct s_hash_table
 {
 	t_pair	*bucket[TABLE_SIZE];
 }	t_hash_table;
+
+
+//Snippet
+
+bool	add_to_snip_lst(t_snippet **head, enum e_token, char *ptr);
+void	insert_snip(t_snippet *node, t_snippet *to_insert);
+void	free_snip_lst(t_snippet *lst);
 
 //Utils
 

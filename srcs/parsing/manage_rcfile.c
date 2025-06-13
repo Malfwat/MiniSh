@@ -97,6 +97,7 @@ void	alias(t_hash_table *table, char *str)
 void	parse_rc(t_hash_table *table)
 {
 	char	*str;
+	int		len;
 	int		fd;
 
 	if (!table || !get_fd(&fd))
@@ -104,6 +105,9 @@ void	parse_rc(t_hash_table *table)
 	str = get_next_line(fd);
 	while (str)
 	{
+		len = ft_strlen(str);
+		if (len > 0 && str[len - 1] == '\n')
+			str[len - 1] = 0;
 		alias(table, str);
 		free(str);
 		str = get_next_line(fd);
