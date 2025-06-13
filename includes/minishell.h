@@ -88,5 +88,8 @@ int		read_null_terminated(int fd, char *buffer, int buffer_size);
 bool	closed_word(char const buffer[], char *quote_ptr, int *bracket_ptr);
 
 bool	is_opened(char *str);
+int		find_closing_bracket(char *opening_bracket);
+int		dollar_len(char *str_dollar);
+void	expand_env_var(char **env, char *varname, int len);
 
 #endif

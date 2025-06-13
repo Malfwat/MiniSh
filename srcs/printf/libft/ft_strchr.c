@@ -12,6 +12,28 @@
 
 #include <stddef.h>
 
+char	*ft_strchr_len(const char *s, int c, int len)
+{
+	int		i;
+	char	*str;
+	char	a;
+
+	a = (char)c;
+	str = (char *)s;
+	i = 0;
+	if (!s)
+		return (NULL);
+	while (str[i] && i < len)
+	{
+		if (str[i] == a)
+			return (&(str[i]));
+		i++;
+	}
+	if (a == '\0')
+		return (&(str[i]));
+	return (NULL);
+}
+
 char	*ft_strchr(const char *s, int c)
 {
 	int		i;
