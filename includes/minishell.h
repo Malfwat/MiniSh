@@ -2,7 +2,7 @@
 # define MINISHELL_H
 
 # define PROMPT_CHARSET "uhHwW$\\"
-# define SEP "| &<>;"
+# define SEP "| &<>;$"
 # define OPENER "'\"("
 # define HOSTNAME_FILE	"/etc/hostname"
 # define PROMPT "minishell> "

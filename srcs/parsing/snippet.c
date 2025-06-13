@@ -65,6 +65,6 @@ void	free_snip_lst(t_snippet *lst)
 		tmp = lst->next;
 		free(lst->ptr);
 		free(lst);
-		lst = lst->next;
+		lst = tmp;
 	}
 }

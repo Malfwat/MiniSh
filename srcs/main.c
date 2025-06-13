@@ -67,15 +67,30 @@ int	word_len(char *str)
 	i = 0;
 	while (str[i])
 	{
+		if (!i)
+			while (ft_strchr(SEP, str[i]))
+				i++;
 		while (str[i] && !ft_strchr(SEP, str[i]) && !ft_strchr(OPENER, str[i]))
 			i++;
 		if (!str[i] || ft_strchr(SEP, str[i]))
+			return (i);
+		if (ft_strchr(OPENER, str[i]) && *str == '$')
 			return (i);
 		i += closing_match(str + i) + 1;
 	}
 	return (i);
 }
-
+/*
+enum e_token get_token(char *str, int *len_ptr)
+{
+	if (!ft_strncmp(str, "<<", 2))
+	{
+		str += 2;
+		
+	}
+}
+*/
+//t_snippet	*lexer(char *str, t_hash_table *table)
 void	lexer(char *str, t_hash_table *table)
 {
 	bool	count;
