@@ -67,9 +67,14 @@ int	word_len(char *str)
 	i = 0;
 	while (str[i])
 	{
-		if (!i)
-			while (ft_strchr(SEP, str[i]))
-				i++;
+		if (!i && ft_strchr(SEP, str[i]))
+		{
+			if (*str == '(' || *str == ')' || *str == ';')
+				return (1);
+			if (*str == '<' || *str == '>' || *str == '|')
+				return ((int []){1, 2}[str[0] == str[1]]);
+			i++;
+		}
 		while (str[i] && !ft_strchr(SEP, str[i]) && !ft_strchr(OPENER, str[i]))
 			i++;
 		if (!str[i] || ft_strchr(SEP, str[i]))
@@ -80,46 +85,91 @@ int	word_len(char *str)
 	}
 	return (i);
 }
-/*
-enum e_token get_token(char *str, int *len_ptr)
+
+enum e_token get_token(char *str)
 {
 	if (!ft_strncmp(str, "<<", 2))
-	{
-		str += 2;
-		
-	}
+		return (here_doc);
+	if (*str == '<')
+		return (redir_in);
+	if (!ft_strncmp(str, ">>", 2))
+		return (append);
+	if (*str == '>')
+		return (redir_out);
+	if (!ft_strncmp(str, "||", 2))
+		return (or);
+	if (*str == '|')
+		return (pipe_delim);
+	if (!ft_strncmp(str, "&&", 2))
+		return (and);
+	if (*str == ';')
+		return (semicolon);
+	if (*str == '(')
+		return (open_par);
+	if (*str == ')')
+		return (closing_par);
+	return (word);
 }
-*/
-//t_snippet	*lexer(char *str, t_hash_table *table)
-void	lexer(char *str, t_hash_table *table)
+
+t_snippet	*lexer(char *str, t_hash_table *table)
 {
-	bool	count;
-	int		len;
-	t_pair	*pair;
+	int			len;
+	t_snippet	*lst;
+	char		*dup;
+
+	(void)table;
 
 	if (!str)
-		return ;
-	count = false;
+		return (NULL);
+	lst = NULL;
 	while (*str)
 	{
 		len = word_len(str);
-		if (!count)
-		{
-			count = true;
-			pair = get_pair(table, str, len);
-			if (pair)
-				ft_putstr(pair->value);
-			else
-				write(STDOUT_FILENO, str, len);
-		}
-		else
-			write(STDOUT_FILENO, str, len);
-		ft_putchar_fd('\n', STDOUT_FILENO);
+		dup = ft_strndup(str, len);
+		if (!dup || !add_to_snip_lst(&lst, get_token(dup), dup))
+			return (free_snip_lst(lst), NULL);
 		str += len;
 		str = pass_whitespace(str);
 	}
-	write(1, "\n", 1);
+	return (lst);
 }
+
+
+//#include <stdio.h>
+
+// Convertit le token en une chaîne lisible
+const char *token_to_str(enum e_token token)
+{
+	switch (token)
+	{
+		case word:         return "word";
+		case redir_in:     return "redir_in";
+		case redir_out:    return "redir_out";
+		case here_doc:     return "here_doc";
+		case append:       return "append";
+		case pipe_delim:   return "pipe_delim";
+		case or:           return "or";
+		case and:          return "and";
+		case semicolon:    return "semicolon";
+		case open_par:     return "open_par";
+		case closing_par:  return "closing_par";
+		default:           return "unknown";
+	}
+}
+
+// Affiche la liste chaînée
+void print_snippet_list(t_snippet *head)
+{
+	int i = 0;
+	while (head)
+	{
+		ft_printf("Node %d:\n", i++);
+		ft_printf("  Token : %-13s\n", token_to_str(head->token));
+		ft_printf("  Ptr   : %s\n", head->ptr ? head->ptr : "(null)");
+		head = head->next;
+	}
+}
+
 
 int	main(int ac, char **av, char **env)
 {
@@ -131,6 +181,7 @@ int	main(int ac, char **av, char **env)
 	int			history_fd;
 	int			ret_val;
 	t_prompt	prompt_var;
+	t_snippet	*lst;
 	t_hash_table table;
 
 
@@ -166,7 +217,13 @@ int	main(int ac, char **av, char **env)
 			ms_add_history(str, history_fd, &prev_cmdline);
 			if (!prev_cmdline)
 				ft_putstr_fd("Error saving prev_cmdline\n", 2);
-			lexer(str, &table);
+			lst = lexer(str, &table);
+			if (!lst)
+			{
+				free(str);
+				break ;
+			}
+			print_snippet_list(lst);
 		}
 		free(str);
 		str = NULL;

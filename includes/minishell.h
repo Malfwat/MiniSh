@@ -2,8 +2,8 @@
 # define MINISHELL_H
 
 # define PROMPT_CHARSET "uhHwW$\\"
-# define SEP "| &<>;$"
-# define OPENER "'\"("
+# define SEP "| &<>;$()"
+# define OPENER "'\""
 # define HOSTNAME_FILE	"/etc/hostname"
 # define PROMPT "minishell> "
 # define MS_HISTORY ".ms_history"

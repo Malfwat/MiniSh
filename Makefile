@@ -57,7 +57,7 @@ LIBPRINTF	=	srcs/printf/libftprintf.a
 all:	$(NAME)
 
 $(LIBPRINTF):
-	make -C srcs/printf
+	make bonus -C srcs/printf
 
 $(NAME):	$(LIBPRINTF) $(OBJ)
 	$(CC) $(OBJ) -o $@ $(LDFLAGS) -L/srcs/printf $(LIBPRINTF)
