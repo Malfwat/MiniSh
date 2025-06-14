@@ -157,15 +157,76 @@ const char *token_to_str(enum e_token token)
 	}
 }
 
-// Affiche la liste chaînée
-void print_snippet_list(t_snippet *head)
+int	ft_strncmp_weq(char *name, char *env_var, size_t n)
 {
+	while (n && *name)
+	{
+		if (*name != *env_var)
+			return (1);
+		--n;
+		++name;
+		++env_var;
+	}
+	if (!n && *env_var == '=')
+		return (0);
+	return (1);
+}
+
+char	**expand(char **env, char *var_name, int len)
+{
+	static char	set[] = {'\t', '\v', '\n', '\r', '\f', ' ', 0};
+	int	i;
+
+	i = 0;
+	while (env[i] && ft_strncmp_weq(var_name, env[i], len))
+		i++;
+	if (env[i])
+		return (ft_split_set(env[i] + len + 1, set));
+	return (NULL);
+}
+
+int	dollar_len(char *str)
+{
+	int	i;
+
+	if (!str || *str != '$')
+		return (0);
+	i = 1;
+	if (str[1] == '$')
+		return (2);
+	while (ft_isalnum(str[i]) || str[i] == '_')
+		i++;
+	return (i);
+}
+
+// Affiche la liste chaînée
+void print_snippet_list(t_snippet *head, char **env)
+{
+	char	**tab;
+	char	*ptr;
+	int		len;
 	int i = 0;
+
+	// Je dois etre capable de detecter lorsque les var sont entre single quote ou double quote et je ne dois pas print les quotes a l'exterieur
+	// creer les nouveau snippet apres le split si necessaire
+	// join apres le split si necessaire et bien free
+
 	while (head)
 	{
 		ft_printf("Node %d:\n", i++);
 		ft_printf("  Token : %-13s\n", token_to_str(head->token));
 		ft_printf("  Ptr   : %s\n", head->ptr ? head->ptr : "(null)");
+		ptr = ft_strchr(head->ptr, '$');
+		while (ptr)
+		{
+			len = dollar_len(ptr);
+			tab = expand(env, ptr + 1, len - 1);
+			int y = 0;
+			while (tab && tab[y])
+				ft_printf("%s\t", tab[y++]);
+			ptr = ft_strchr(ptr + len, '$');
+			write(1, "\n", 1);
+		}
 		head = head->next;
 	}
 }
@@ -223,7 +284,7 @@ int	main(int ac, char **av, char **env)
 				free(str);
 				break ;
 			}
-			print_snippet_list(lst);
+			print_snippet_list(lst, env);
 		}
 		free(str);
 		str = NULL;
