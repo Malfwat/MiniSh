@@ -206,27 +206,37 @@ void print_snippet_list(t_snippet *head, char **env)
 	char	*ptr;
 	int		len;
 	int i = 0;
+	int	counter;
 
 	// Je dois etre capable de detecter lorsque les var sont entre single quote ou double quote et je ne dois pas print les quotes a l'exterieur
 	// creer les nouveau snippet apres le split si necessaire
 	// join apres le split si necessaire et bien free
-
+	// Je peux surement faire un fork avec des sous snip ecrire dans un fork split avec un genre de get next word comme je le fais actuellement et ajouter les snip en les inserant;
 	while (head)
 	{
 		ft_printf("Node %d:\n", i++);
 		ft_printf("  Token : %-13s\n", token_to_str(head->token));
 		ft_printf("  Ptr   : %s\n", head->ptr ? head->ptr : "(null)");
 		ptr = ft_strchr(head->ptr, '$');
+		counter = 0;
 		while (ptr)
 		{
+			if (!counter++)
+				write(1, head->ptr, ptr - head->ptr);
 			len = dollar_len(ptr);
 			tab = expand(env, ptr + 1, len - 1);
 			int y = 0;
+			if (is_white_space(*head->ptr))
+				ft_putchar_fd(' ', 1);
 			while (tab && tab[y])
-				ft_printf("%s\t", tab[y++]);
+			{
+				ft_printf("%s", tab[y++]);
+				if (tab[y])
+					write(1, " ", 1);
+			}
 			ptr = ft_strchr(ptr + len, '$');
-			write(1, "\n", 1);
 		}
+		write(1, "\n", 1);
 		head = head->next;
 	}
 }

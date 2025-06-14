@@ -22,6 +22,7 @@ t_snippet	*new_snip(enum e_token token, char *ptr)
 	new->token = token;
 	new->ptr = ptr;
 	new->next = NULL;
+	new->expand_snip = NULL;
 	return (new);
 }
 

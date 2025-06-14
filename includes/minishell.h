@@ -56,6 +56,7 @@ typedef struct s_node
 	enum e_token	token;
 	char			*ptr;
 	struct s_node	*next;
+	struct s_node	*expand_snip;
 }	t_snippet;
 
 # define TABLE_SIZE 512 // Always 2^n to keep the speed
