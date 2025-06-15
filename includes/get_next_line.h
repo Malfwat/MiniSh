@@ -38,6 +38,7 @@ typedef struct s_stash
 }	t_buf;
 
 char	*get_next_line(int fd);
+char	*get_next_null(int fd);
 //char	*get_line(int fd, char *stash, char **line, t_buf *lst);
 //int		check_stash(char **stash, char	**line, char *new_stash, int i);
 //int		join_t_buf(t_buf **begin, char **stash, char **line);

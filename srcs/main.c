@@ -149,6 +149,9 @@ bool	simple_sep(char c)
 	return (false);
 }
 
+
+const char *token_to_string(enum e_token token);
+
 t_snippet	*lexer(char *str, t_hash_table *table)
 {
 	int			len;
@@ -317,12 +320,6 @@ void	expand_token(char *ptr, char **env, int len, char scope)
 	}
 }
 
-#include <signal.h>
-
-
-
-
-
 
 #include <stdio.h>
 
@@ -354,13 +351,6 @@ void print_snippet_list(t_snippet *head)
 		head = head->next;
 	}
 }
-
-
-
-
-
-
-
 
 int	main(int ac, char **av, char **env)
 {
@@ -414,12 +404,8 @@ int	main(int ac, char **av, char **env)
 				free(str);
 				break ;
 			}
-			//signal(SIGINT, SIG_DFL);
-			expand_snip(&lst, lst, env, true);
-			//expand_snip(&lst, lst, env, false);
+			expand_snip(&lst, lst->next->next, env, true);
 			print_snippet_list(lst);
-			//expand_snip(NULL, lst, env, true);
-			write(1, "\n", 1);
 		}
 		free(str);
 		str = NULL;

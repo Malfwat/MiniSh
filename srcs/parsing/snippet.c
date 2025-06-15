@@ -86,18 +86,20 @@ bool	expand_snip(t_snippet **head, t_snippet *to_expand, char **env, bool one_bl
 	if (dup2(pipe_fds[1], STDOUT_FILENO) < 0)
 		return (close(pipe_fds[0]), close(pipe_fds[1]), false);
 	expand_token(to_expand->ptr, env, ft_strlen(to_expand->ptr), (char)one_block);
+
+			write(1, "\0", 1);
 	close(pipe_fds[1]);
 	dup2(stdout_fd, STDOUT_FILENO);
 
 
-	char *str = get_next_line(pipe_fds[0]);
+	char *str = get_next_null(pipe_fds[0]);
 	while (str)
 	{
 		if (*str && str[ft_strlen(str) - 1] == '\n')
 			str[ft_strlen(str) - 1] = 0;
 		if (!add_to_snip_lst(&new_lst, word, str))
 			return (free_snip_lst(new_lst), false);
-		str = get_next_line(pipe_fds[0]);
+		str = get_next_null(pipe_fds[0]);
 	}
 	close(pipe_fds[0]);
 

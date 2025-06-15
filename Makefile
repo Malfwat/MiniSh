@@ -16,6 +16,7 @@ SRC	=	main.c
 
 SRC +=	gnl/get_next_line_utils.c\
 		gnl/get_next_line.c\
+		gnl/get_next_null.c\
 		gnl/gnl.c\
 		gnl/gnl_utils.c\
 		gnl/utils.c

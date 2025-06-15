@@ -76,7 +76,8 @@ t_buf	*gnl_new_elem(char *buf)
 		return (free(new), NULL);
 	while (buf && buf[++i])
 		(new->str)[i] = buf[i];
-	(new->str)[i] = 0;
+	while (i < BUFFER_SIZE)
+		(new->str)[i++] = 0;
 	new->next = NULL;
 	return (new);
 }
