@@ -164,7 +164,7 @@ int	ft_strncmp_weq(char *name, char *env_var, size_t n)
 }
 
 //char	**expand(char **env, char *var_name, int len)
-void	expand(char **env, char *var_name, int len)
+char	*expand(char **env, char *var_name, int len)
 {
 //	static char	set[] = {'\t', '\v', '\n', '\r', '\f', ' ', 0};
 	int	i;
@@ -173,7 +173,8 @@ void	expand(char **env, char *var_name, int len)
 	while (env[i] && ft_strncmp_weq(var_name, env[i], len))
 		i++;
 	if (env[i])
-		ft_putstr_fd(env[i] + len + 1, 1);
+		return (env[i] + len + 1);
+	return (NULL);
 //		return (ft_split_set(env[i] + len + 1, set));
 //	return (NULL);
 }
@@ -192,16 +193,65 @@ int	dollar_len(char *str)
 	return (i);
 }
 
+size_t	write_snip(char *str, char *quote, int pfd, int len)
+{
+	int	i;
+
+	if (!str || !quote || !*str)
+		return (0);
+	i = 0;
+	while (str[i] && i < len)
+	{
+		if (!*quote && (str[i] == '\'' || str[i] == '"'))
+			*quote = str[i];
+		else if (*quote == str[i])
+			*quote = 0;
+		if (str[i] == ' ' && !*quote)
+			return (write(pfd, str, i));
+		i++;
+	}
+	return (write(pfd, str, i));
+}
+
+void	write_without_quote(int pfd, char *str, int len)
+{
+	int		i;
+	int		len_to_write;
+	char	*ptr;
+
+	if (!str)
+		return ;
+	i = 0;
+	while (*str && i < len)
+	{
+		if (*str != '\'')
+			ft_putchar_fd(*str, pfd);
+		else
+		{
+			str++;
+			ptr = ft_strchr(str, '\'');
+			len_to_write = ptr - str;
+			i += len_to_write + 2;
+			write(pfd, str , len_to_write);
+			str = ptr;
+		}
+		str++;
+		i++;
+	}
+}
 
 void	expand_token(char *ptr, char **env, int len)
 {
 //	int		pipe_fds[2];
+	char	*tmp;
 	int		final_len;
 	int		wlen;
 	int		i;
+	char	quote = 0;
 
 	(void)env;(void)final_len;
 
+	size_t	test;
 //	if (pipe(pipe_fds) < 0)
 //		return (NULL);
 //	final_len = 0;
@@ -216,22 +266,41 @@ void	expand_token(char *ptr, char **env, int len)
 			wlen = word_len(ptr, dollar_n_sep);
 		if (*ptr == '"')
 		{
-			ft_putstr_fd("\"", 1);
+			//ft_putstr_fd("\"", 1);
 			expand_token(ptr + 1, env, wlen - 2);
-			ft_putstr_fd("\"", 1);
+			//ft_putstr_fd("\"", 1);
 		}
 		else
 		{
 			if (*ptr == '$')
-				expand(env, ptr + 1, wlen - 1);
+			{
+				tmp = expand(env, ptr + 1, wlen - 1);
+				if (tmp)
+				{
+					while (*tmp)
+					{
+						test = write_snip(tmp, &quote, 2, ft_strlen(tmp));
+						if (test != ft_strlen(tmp))
+						{
+							write(1, "\n", 1);
+							tmp += test;
+							tmp = pass_whitespace(tmp);
+						}
+						else
+							break ;
+					}
+				}
+			}
 			else
-				write(1, ptr, wlen);
+				write_without_quote(1, ptr, wlen);
 			//write(1, "\n", 1);
 		}
 		ptr += wlen;
 		i += wlen;
 	}
 }
+
+#include <signal.h>
 
 int	main(int ac, char **av, char **env)
 {
@@ -285,6 +354,7 @@ int	main(int ac, char **av, char **env)
 				free(str);
 				break ;
 			}
+			signal(SIGINT, SIG_DFL);
 			expand_token(lst->ptr, env, ft_strlen(lst->ptr));
 			write(1, "\n", 1);
 		}

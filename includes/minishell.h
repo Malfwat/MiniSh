@@ -36,6 +36,13 @@ typedef struct s_pair
 	struct s_pair	*next;
 }	t_pair;
 
+typedef	struct s_pipe_buf
+{
+	int					fd;
+	int					len;
+	struct s_pipe_buf	*next;
+}	t_exp;
+
 enum e_token
 {
 	word,
