@@ -64,8 +64,6 @@ bool	check_alias_chars(char *str)
 	return (true);
 }
 
-
-
 bool	is_alias_cmd(char *str, char **ptr)
 {
 	if (ft_strncmp(str, ALIAS, ALIAS_LEN))
@@ -106,7 +104,7 @@ void	parse_rc(t_hash_table *table)
 	while (str)
 	{
 		len = ft_strlen(str);
-		if (str[len - 1] == '\n')
+		if (len > 0 && str[len - 1] == '\n')
 			str[len - 1] = 0;
 		alias(table, str);
 		free(str);

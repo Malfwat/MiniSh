@@ -33,12 +33,7 @@ bool	is_opened(char *str)
 	return (quote || bracket > 0);
 }
 
-int	closing_match(char *ptr)
-{
-	if (*ptr == '\'' || *ptr == '"')
-		return (ft_strchr(ptr + 1, *ptr) - ptr);
-	return (find_closing_bracket(ptr));
-}
+int	closing_match(char *ptr);
 
 int	find_closing_bracket(char *opening_bracket)
 {
@@ -58,58 +53,100 @@ int	find_closing_bracket(char *opening_bracket)
 	return (i);
 }
 
-int	word_len(char *str)
+int	closing_match(char *ptr)
+{
+	if (*ptr == '\'' || *ptr == '"')
+		return (ft_strchr(ptr + 1, *ptr) - ptr);
+	return (find_closing_bracket(ptr));
+}
+
+int	word_len(char *str, bool (*is_sep)(char ))
 {
 	int		i;
 
 	i = 0;
 	while (str[i])
 	{
-		while (str[i] && !ft_strchr(SEP, str[i]) && !ft_strchr(OPENER, str[i]))
+		if (!i && is_sep(str[i]))
+		{
+			if (*str == '(' || *str == ')' || *str == ';')
+				return (1);
+			if (*str == '<' || *str == '>' || *str == '|')
+				return ((int []){1, 2}[str[0] == str[1]]);
 			i++;
-		if (!str[i] || ft_strchr(SEP, str[i]))
+		}
+		while (str[i] && !is_sep(str[i]) && !ft_strchr(OPENER, str[i]))
+			i++;
+		if (!str[i] || is_sep(str[i]))
+			return (i);
+		if (is_sep(str[i]) && *str == '$')
 			return (i);
 		i += closing_match(str + i) + 1;
 	}
 	return (i);
 }
 
-void	print_without_quote(char **env, char *str, int len)
+enum e_token get_token(char *str)
 {
-	int		i;
-	int		j;
-	char	quote;
-	char	*ptr;
+	if (!ft_strncmp(str, "<<", 2))
+		return (here_doc);
+	if (*str == '<')
+		return (redir_in);
+	if (!ft_strncmp(str, ">>", 2))
+		return (append);
+	if (*str == '>')
+		return (redir_out);
+	if (!ft_strncmp(str, "||", 2))
+		return (or);
+	if (*str == '|')
+		return (pipe_delim);
+	if (!ft_strncmp(str, "&&", 2))
+		return (and);
+	if (*str == ';')
+		return (semicolon);
+	if (*str == '(')
+		return (open_par);
+	if (*str == ')')
+		return (closing_par);
+	return (word);
+}
+
+bool	dollar_n_sep(char c)
+{
+	if (ft_strchr(SEP, c) || c == '$')
+		return (true);
+	return (false);
+}
+
+bool	simple_sep(char c)
+{
+	if (ft_strchr(SEP, c))
+		return (true);
+	return (false);
+}
+
+t_snippet	*lexer(char *str, t_hash_table *table)
+{
+	int			len;
+	t_snippet	*lst;
+	char		*dup;
+
+	(void)table;
 
 	if (!str)
-		return ;
-	if (!ft_strchr(str, '\'') && !ft_strchr(str, '\"'))
-		return (ft_putstr_fd(str, STDOUT_FILENO));
-	j = 0;
-	while (*str && j < len)
+		return (NULL);
+	lst = NULL;
+	while (*str)
 	{
-		i = 0;
-		while (str[i] && str[i] != '\'' && str[i] != '\"')
-			i++;
-		j += i;
-		write(STDOUT_FILENO, str, i);
-		if (j >= len)
-			break ;
-		str += i;
-		if (*str == '\'' || *str == '\"')
-		{
-			quote = *str;
-			str++;
-			j++;
-			ptr = ft_strchr(str, quote);
-			if (!ft_strchr_len(str, '$', ptr - str) || quote == '\'')
-				write(STDOUT_FILENO, str, ptr - str);
-			else
-				expand_env_var(env, str + 1, dollar_len(str + 1));
-			j += (ptr - str) + 1;
-			str = ptr + 1;
-		}
+		len = word_len(str, simple_sep);
+		dup = ft_strndup(str, len);
+		if (!dup || !add_to_snip_lst(&lst, get_token(dup), dup))
+			return (free_snip_lst(lst), NULL);
+		str += len;
+		str = pass_whitespace(str);
+		write(1, " ", 1);
 	}
+	return (lst);
 }
 
 int	ft_strncmp_weq(char *name, char *env_var, size_t n)
@@ -127,124 +164,144 @@ int	ft_strncmp_weq(char *name, char *env_var, size_t n)
 	return (1);
 }
 
-void	expand_env_var(char **env, char *varname, int len)
+//char	**expand(char **env, char *var_name, int len)
+char	*expand(char **env, char *var_name, int len)
 {
+//	static char	set[] = {'\t', '\v', '\n', '\r', '\f', ' ', 0};
 	int	i;
 
-	if (!env || !varname || !*varname)
-		return ;
 	i = 0;
-	while (env[i] && ft_strncmp_weq(varname, env[i], len))
+	while (env[i] && ft_strncmp_weq(var_name, env[i], len))
 		i++;
 	if (env[i])
-		print_without_quote(env, env[i] + len + 1, ft_strlen(env[i] + len));
-	else
-		print_without_quote(env, varname, len);
+		return (env[i] + len + 1);
+	return (NULL);
+//		return (ft_split_set(env[i] + len + 1, set));
+//	return (NULL);
 }
 
-int	dollar_len(char *str_dollar)
+int	dollar_len(char *str)
 {
 	int	i;
 
-	i = 0;
-	if (!str_dollar)
+	if (!str || *str != '$')
 		return (0);
-	if (*str_dollar == '$')
-		str_dollar++;
-	while (ft_isalnum(str_dollar[i]) || str_dollar[i] == '_')
+	i = 1;
+	if (str[1] == '$')
+		return (2);
+	while (ft_isalnum(str[i]) || str[i] == '_')
 		i++;
 	return (i);
 }
 
-#define REDIR_IN "<"
-#define REDIR_OUT ">"
-#define HERE_DOC "<<"
-#define APPEND ">>"
-
-void	pass_sep(char **str)
+size_t	write_snip(char *str, char *quote, int pfd, int len)
 {
-	if (!ft_strncmp(*str, HERE_DOC, 2))
+	int	i;
+
+	if (!str || !quote || !*str)
+		return (0);
+	i = 0;
+	while (str[i] && i < len)
 	{
-		ft_putstr_fd(HERE_DOC, STDOUT_FILENO);
-		(*str) += 2;
-		(*str) += write(STDOUT_FILENO, *str, word_len(*str));
+		if (!*quote && (str[i] == '\'' || str[i] == '"'))
+			*quote = str[i];
+		else if (*quote == str[i])
+			*quote = 0;
+		if (str[i] == ' ' && !*quote)
+			return (write(pfd, str, i));
+		i++;
 	}
-	else if (!ft_strncmp(*str, APPEND, 2))
-	{
-		ft_putstr_fd(APPEND, STDOUT_FILENO);
-		(*str) += 2;
-		*str = pass_whitespace(*str);
-	}
-	else if (!ft_strncmp(*str, REDIR_IN, 1) || !ft_strncmp(*str, REDIR_OUT, 1))
-	{
-		ft_putchar_fd(**str, STDOUT_FILENO);
-		(*str)++;
-		*str = pass_whitespace(*str);
-	}
-	else
-	{
-		ft_putchar_fd(**str, STDOUT_FILENO);
-		(*str)++;
-	}
+	return (write(pfd, str, i));
 }
 
-void	expand(char **env, char *str, t_hash_table *table)
+void	write_without_quote(int pfd, char *str, int len)
 {
-	bool	count;
-	int		len;
-	t_pair	*pair;
+	int		i;
+	int		len_to_write;
+	char	*ptr;
 
 	if (!str)
 		return ;
-	count = false;
-	while (*str)
+	i = 0;
+	while (*str && i < len)
 	{
-		if (*str == '$')
-			len = dollar_len(str);
+		if (*str != '\'')
+			ft_putchar_fd(*str, pfd);
 		else
-			len = word_len(str);
-		if (!len)
 		{
-			pass_sep(&str);
-			continue ;
-			exit(0);
+			str++;
+			ptr = ft_strchr(str, '\'');
+			len_to_write = ptr - str;
+			i += len_to_write + 2;
+			write(pfd, str , len_to_write);
+			str = ptr;
 		}
-		if (!count)
-		{
-			count = true;
-			pair = get_pair(table, str, len);
-			if (pair)
-			{
-				if (pair->value[0] == '$')
-					expand_env_var(env, pair->value + 1, dollar_len(pair->value + 1) + 1);
-				else
-					print_without_quote(env, pair->value, ft_strlen(pair->value));
-			}
-			else
-			{
-				if (*str == '$')
-				{
-					expand_env_var(env, str+ 1, len);
-					len++;
-				}
-				else
-					print_without_quote(env, str, len);
-			}
-		}
-		else
-			if (*str == '$')
-			{
-				expand_env_var(env, str+ 1, len);
-				len++;
-			}
-			else
-				print_without_quote(env, str, len);
-		str += len;
-		str = pass_whitespace(str);
-		write(1, " ", 1);
+		str++;
+		i++;
 	}
-	write(1, "\n", 1);
 }
+
+void	expand_token(char *ptr, char **env, int len)
+{
+//	int		pipe_fds[2];
+	char	*tmp;
+	int		final_len;
+	int		wlen;
+	int		i;
+	char	quote = 0;
+
+	(void)env;(void)final_len;
+
+	size_t	test;
+//	if (pipe(pipe_fds) < 0)
+//		return (NULL);
+//	final_len = 0;
+	i = 0;
+	while (*ptr && i < len)
+	{
+		if (*ptr == '$')
+			wlen = dollar_len(ptr);
+		else if (*ptr == '\'' || *ptr == '"')
+			wlen = closing_match(ptr) + 1;
+		else
+			wlen = word_len(ptr, dollar_n_sep);
+		if (*ptr == '"')
+		{
+			//ft_putstr_fd("\"", 1);
+			expand_token(ptr + 1, env, wlen - 2);
+			//ft_putstr_fd("\"", 1);
+		}
+		else
+		{
+			if (*ptr == '$')
+			{
+				tmp = expand(env, ptr + 1, wlen - 1);
+				if (tmp)
+				{
+					while (*tmp)
+					{
+						test = write_snip(tmp, &quote, 2, ft_strlen(tmp));
+						if (test != ft_strlen(tmp))
+						{
+							write(1, "\n", 1);
+							tmp += test;
+							tmp = pass_whitespace(tmp);
+						}
+						else
+							break ;
+					}
+				}
+			}
+			else
+				write_without_quote(1, ptr, wlen);
+			//write(1, "\n", 1);
+		}
+		ptr += wlen;
+		i += wlen;
+	}
+}
+
+#include <signal.h>
 
 int	main(int ac, char **av, char **env)
 {
@@ -256,6 +313,7 @@ int	main(int ac, char **av, char **env)
 	int			history_fd;
 	int			ret_val;
 	t_prompt	prompt_var;
+	t_snippet	*lst;
 	t_hash_table table;
 
 
@@ -291,7 +349,15 @@ int	main(int ac, char **av, char **env)
 			ms_add_history(str, history_fd, &prev_cmdline);
 			if (!prev_cmdline)
 				ft_putstr_fd("Error saving prev_cmdline\n", 2);
-			expand(env, str, &table);
+			lst = lexer(str, &table);
+			if (!lst)
+			{
+				free(str);
+				break ;
+			}
+			//signal(SIGINT, SIG_DFL);
+			expand_token(lst->ptr, env, ft_strlen(lst->ptr));
+			write(1, "\n", 1);
 		}
 		free(str);
 		str = NULL;

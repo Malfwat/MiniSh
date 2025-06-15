@@ -70,6 +70,7 @@ void	ft_lstiter(t_list *lst, void (*f)(void *));
 char	*ft_strtrim(char const *s1, char const *set);
 t_list	*ft_lstmap(t_list *lst, void *(*f)(void *), void (*del)(void *));
 char	**ft_split(char const *s, char c);
+char	**ft_split_set(char const *s, char *set);
 void	ft_putendl_fd(char *s, int fd);
 
 #endif /*LIBFT_H*/
