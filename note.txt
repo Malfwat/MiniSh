@@ -1,0 +1,9 @@
+malfwa@malfwa-s:~/Documents/minishell$ ad$jgkc$jgkc'oui''$jgkc'"$jgkc""oui$jgkc"
+ad
+$jgkc
+$jgkc
+'oui'
+'$jgkc'
+"$jgkc"
+"oui$jgkc"
+malfwa@malfwa-s:~/Documents/minishell$ 

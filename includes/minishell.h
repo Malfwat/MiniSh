@@ -48,7 +48,8 @@ enum e_token
 	and,
 	semicolon,
 	open_par,
-	closing_par
+	closing_par,
+	env_var
 };
 
 typedef struct s_node
@@ -69,6 +70,7 @@ typedef struct s_hash_table
 
 //Snippet
 
+t_snippet	*new_snip(enum e_token token, char *ptr);
 bool	add_to_snip_lst(t_snippet **head, enum e_token, char *ptr);
 void	insert_snip(t_snippet *node, t_snippet *to_insert);
 void	free_snip_lst(t_snippet *lst);

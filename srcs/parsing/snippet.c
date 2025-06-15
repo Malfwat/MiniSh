@@ -53,7 +53,7 @@ void	insert_snip(t_snippet *node, t_snippet *to_insert)
 {
 	if (!node)
 		ft_putstr_fd("Check your code dumbass (insert_snip)\n", 2);
-	to_insert->next = node->next;
+	get_last_snip(to_insert)->next = node->next;
 	node->next = to_insert;
 }
 
