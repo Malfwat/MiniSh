@@ -1,3 +1,14 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: malfwa <admoufle@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/06/15 14:05:13 by malfwa            #+#    #+#             */
+/*   Updated: 2025/06/15 15:51:15 by malfwa           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include <stdlib.h>
 #include <readline/history.h>
@@ -12,7 +23,7 @@ bool	is_opened(char *str)
 	static int	bracket;
 
 	if (!str)
-		return (false);
+		return (quote || bracket > 0);
 	while (*str)
 	{
 		if (quote == '\'' && *str == '\'')
@@ -55,18 +66,28 @@ int	find_closing_bracket(char *opening_bracket)
 
 int	closing_match(char *ptr)
 {
+	char	*tmp;
+
 	if (*ptr == '\'' || *ptr == '"')
-		return (ft_strchr(ptr + 1, *ptr) - ptr);
+	{
+		tmp = ft_strchr(ptr + 1, *ptr);
+		if (!tmp)
+			return (0);
+		return (tmp - ptr);
+	}
 	return (find_closing_bracket(ptr));
 }
 
-int	word_len(char *str, bool (*is_sep)(char ))
+int	word_len(char *str, bool (*is_sep)(char ), int len)
 {
 	int		i;
+	int		tmp;
 
 	i = 0;
-	while (str[i])
+	while (str[i] && i < len)
 	{
+		tmp = pass_whitespace(str + i) - (str + i);
+		i += tmp;
 		if (!i && is_sep(str[i]))
 		{
 			if (*str == '(' || *str == ')' || *str == ';')
@@ -81,7 +102,10 @@ int	word_len(char *str, bool (*is_sep)(char ))
 			return (i);
 		if (is_sep(str[i]) && *str == '$')
 			return (i);
-		i += closing_match(str + i) + 1;
+		if (!ft_strchr(str + i + 1, str[i]))
+			return (len);
+		tmp = closing_match(str + i);
+		i += tmp + 1;
 	}
 	return (i);
 }
@@ -138,13 +162,12 @@ t_snippet	*lexer(char *str, t_hash_table *table)
 	lst = NULL;
 	while (*str)
 	{
-		len = word_len(str, simple_sep);
+		len = word_len(str, simple_sep, ft_strlen(str));
 		dup = ft_strndup(str, len);
 		if (!dup || !add_to_snip_lst(&lst, get_token(dup), dup))
 			return (free_snip_lst(lst), NULL);
 		str += len;
 		str = pass_whitespace(str);
-		write(1, " ", 1);
 	}
 	return (lst);
 }
@@ -164,10 +187,8 @@ int	ft_strncmp_weq(char *name, char *env_var, size_t n)
 	return (1);
 }
 
-//char	**expand(char **env, char *var_name, int len)
 char	*expand(char **env, char *var_name, int len)
 {
-//	static char	set[] = {'\t', '\v', '\n', '\r', '\f', ' ', 0};
 	int	i;
 
 	i = 0;
@@ -176,8 +197,6 @@ char	*expand(char **env, char *var_name, int len)
 	if (env[i])
 		return (env[i] + len + 1);
 	return (NULL);
-//		return (ft_split_set(env[i] + len + 1, set));
-//	return (NULL);
 }
 
 int	dollar_len(char *str)
@@ -194,7 +213,7 @@ int	dollar_len(char *str)
 	return (i);
 }
 
-size_t	write_snip(char *str, char *quote, int pfd, int len)
+size_t	write_snip(char *str, char *quote, int len)
 {
 	int	i;
 
@@ -208,13 +227,13 @@ size_t	write_snip(char *str, char *quote, int pfd, int len)
 		else if (*quote == str[i])
 			*quote = 0;
 		if (str[i] == ' ' && !*quote)
-			return (write(pfd, str, i));
+			return (write(STDOUT_FILENO, str, i));
 		i++;
 	}
-	return (write(pfd, str, i));
+	return (write(STDOUT_FILENO, str, i));
 }
 
-void	write_without_quote(int pfd, char *str, int len)
+void	write_without_quote(char *str, int len)
 {
 	int		i;
 	int		len_to_write;
@@ -226,14 +245,14 @@ void	write_without_quote(int pfd, char *str, int len)
 	while (*str && i < len)
 	{
 		if (*str != '\'')
-			ft_putchar_fd(*str, pfd);
+			ft_putchar_fd(*str, STDOUT_FILENO);
 		else
 		{
 			str++;
 			ptr = ft_strchr(str, '\'');
 			len_to_write = ptr - str;
 			i += len_to_write + 2;
-			write(pfd, str , len_to_write);
+			write(STDOUT_FILENO, str , len_to_write);
 			str = ptr;
 		}
 		str++;
@@ -241,60 +260,57 @@ void	write_without_quote(int pfd, char *str, int len)
 	}
 }
 
-void	expand_token(char *ptr, char **env, int len)
+void	dollar_expansion(char *ptr, char scope, char *quote)
 {
-//	int		pipe_fds[2];
+	size_t	test;
+	
+	if (ptr && !scope)
+	{
+		while (*ptr)
+		{
+			test = write_snip(ptr, quote, ft_strlen(ptr));
+			if (test != ft_strlen(ptr))
+				write(1, "\n", 1);
+			ptr += test;
+			ptr = pass_whitespace(ptr);
+		}
+	}
+	else if (ptr)
+		write_without_quote(ptr, ft_strlen(ptr));
+}
+
+void	expand_token(char *ptr, char **env, int len, char scope)
+{
 	char	*tmp;
-	int		final_len;
 	int		wlen;
 	int		i;
 	char	quote = 0;
 
-	(void)env;(void)final_len;
 
-	size_t	test;
-//	if (pipe(pipe_fds) < 0)
-//		return (NULL);
-//	final_len = 0;
 	i = 0;
 	while (*ptr && i < len)
 	{
+		// Getting the len to increment ptr
 		if (*ptr == '$')
 			wlen = dollar_len(ptr);
 		else if (*ptr == '\'' || *ptr == '"')
 			wlen = closing_match(ptr) + 1;
 		else
-			wlen = word_len(ptr, dollar_n_sep);
+			wlen = word_len(ptr, dollar_n_sep, len);
+
+
+		// Printing the new snip
 		if (*ptr == '"')
-		{
-			//ft_putstr_fd("\"", 1);
-			expand_token(ptr + 1, env, wlen - 2);
-			//ft_putstr_fd("\"", 1);
-		}
+			expand_token(ptr + 1, env, wlen - 2, *ptr);
 		else
 		{
 			if (*ptr == '$')
 			{
 				tmp = expand(env, ptr + 1, wlen - 1);
-				if (tmp)
-				{
-					while (*tmp)
-					{
-						test = write_snip(tmp, &quote, 2, ft_strlen(tmp));
-						if (test != ft_strlen(tmp))
-						{
-							write(1, "\n", 1);
-							tmp += test;
-							tmp = pass_whitespace(tmp);
-						}
-						else
-							break ;
-					}
-				}
+				dollar_expansion(tmp, scope, &quote);
 			}
 			else
-				write_without_quote(1, ptr, wlen);
-			//write(1, "\n", 1);
+				write_without_quote(ptr, wlen);
 		}
 		ptr += wlen;
 		i += wlen;
@@ -302,6 +318,49 @@ void	expand_token(char *ptr, char **env, int len)
 }
 
 #include <signal.h>
+
+
+
+
+
+
+#include <stdio.h>
+
+const char *token_to_string(enum e_token token)
+{
+	switch (token)
+	{
+		case word: return "word";
+		case redir_in: return "redir_in";
+		case redir_out: return "redir_out";
+		case here_doc: return "here_doc";
+		case append: return "append";
+		case pipe_delim: return "pipe_delim";
+		case or: return "or";
+		case and: return "and";
+		case semicolon: return "semicolon";
+		case open_par: return "open_par";
+		case closing_par: return "closing_par";
+		case env_var: return "env_var";
+		default: return "unknown";
+	}
+}
+
+void print_snippet_list(t_snippet *head)
+{
+	while (head != NULL)
+	{
+		printf("Token: %-12s | Value: %s\n", token_to_string(head->token), head->ptr ? head->ptr : "(null)");
+		head = head->next;
+	}
+}
+
+
+
+
+
+
+
 
 int	main(int ac, char **av, char **env)
 {
@@ -313,7 +372,7 @@ int	main(int ac, char **av, char **env)
 	int			history_fd;
 	int			ret_val;
 	t_prompt	prompt_var;
-	t_snippet	*lst;
+	t_snippet	*lst = NULL;
 	t_hash_table table;
 
 
@@ -356,7 +415,10 @@ int	main(int ac, char **av, char **env)
 				break ;
 			}
 			//signal(SIGINT, SIG_DFL);
-			expand_token(lst->ptr, env, ft_strlen(lst->ptr));
+			expand_snip(&lst, lst, env, true);
+			//expand_snip(&lst, lst, env, false);
+			print_snippet_list(lst);
+			//expand_snip(NULL, lst, env, true);
 			write(1, "\n", 1);
 		}
 		free(str);
@@ -364,6 +426,7 @@ int	main(int ac, char **av, char **env)
 	}
 
 	// Freeing everything 
+	free_snip_lst(lst);
 	free_table(&table);
 	close(history_fd);
 	free(prev_cmdline);

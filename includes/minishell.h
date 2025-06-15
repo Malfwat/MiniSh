@@ -64,7 +64,6 @@ typedef struct s_node
 	enum e_token	token;
 	char			*ptr;
 	struct s_node	*next;
-	struct s_node	*expand_snip;
 }	t_snippet;
 
 # define TABLE_SIZE 512 // Always 2^n to keep the speed
@@ -81,6 +80,7 @@ t_snippet	*new_snip(enum e_token token, char *ptr);
 bool	add_to_snip_lst(t_snippet **head, enum e_token, char *ptr);
 void	insert_snip(t_snippet *node, t_snippet *to_insert);
 void	free_snip_lst(t_snippet *lst);
+bool	expand_snip(t_snippet **head, t_snippet *to_expand, char **env, bool one_block);
 
 //Utils
 
@@ -131,4 +131,5 @@ int		find_closing_bracket(char *opening_bracket);
 int		dollar_len(char *str_dollar);
 void	expand_env_var(char **env, char *varname, int len);
 
+void	expand_token(char *ptr, char **env, int len, char scope);
 #endif

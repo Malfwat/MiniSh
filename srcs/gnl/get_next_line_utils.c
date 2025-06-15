@@ -32,6 +32,22 @@ int	free_lst(t_buf **lst)
 	return (0);
 }
 
+int	in_str_len(char *str, char c, int len)
+{
+	int	i;
+
+	i = 0;
+	if (!str)
+		return (-1);
+	while (i < len)
+	{
+		if (str[i] == c)
+			return (i);
+		i++;
+	}
+	return (-1);
+}
+
 int	in_str(char *str, char c)
 {
 	int	i;
