@@ -177,13 +177,11 @@ void optimize_lst(t_snippet **head)
 
 const char *token_to_string(enum e_token token);
 
-t_snippet	*lexer(char *str, t_hash_table *table)
+t_snippet	*lexer(char *str)
 {
 	int			len;
 	t_snippet	*lst;
 	char		*dup;
-
-	(void)table;
 
 	if (!str)
 		return (NULL);
@@ -426,7 +424,7 @@ int	main(int ac, char **av, char **env)
 			ms_add_history(str, history_fd, &prev_cmdline);
 			if (!prev_cmdline)
 				ft_putstr_fd("Error saving prev_cmdline\n", 2);
-			lst = lexer(str, &table);
+			lst = lexer(str);
 			if (!lst)
 			{
 				free(str);
@@ -434,8 +432,11 @@ int	main(int ac, char **av, char **env)
 			}
 			//expand_snip(&lst, lst, env, true);
 			if (check_syntaxe(lst))
+			{
 				optimize_lst(&lst);
-			print_snippet_list(lst);
+				replace_aliases(&lst, &table);
+				print_snippet_list(lst);
+			}
 		}
 		free(str);
 		str = NULL;

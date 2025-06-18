@@ -32,7 +32,8 @@ SRC	+=	parsing/readline.c\
 		parsing/manage_rcfile.c\
 		parsing/snippet.c\
 		parsing/hash_utils.c\
-		parsing/syntaxe/check_syntaxe.c
+		parsing/syntaxe/check_syntaxe.c\
+		parsing/syntaxe/alias.c
 
 SRC	+=	prompt/generate_prompt.c\
 		prompt/write_prompt.c

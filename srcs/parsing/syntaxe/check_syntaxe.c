@@ -43,7 +43,7 @@ bool	check_syntaxe(t_snippet *lst)
 
 	prev = lst->token;
 	if (is_cntl_op(prev) || prev == closing_par)
-		return (ft_printf("minishell: syntax error near unexpected token `%c'\n", lst->ptr[0]), false);
+		return (ft_printf("minishell: syntax error near unexpected token `%s'\n", lst->ptr), false);
 	lst = lst->next;
 	ptr = NULL;
 	bracket = (int []){0, 1}[prev == open_par];
