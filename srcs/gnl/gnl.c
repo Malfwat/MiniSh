@@ -59,7 +59,7 @@ static void	update_stash(char *line, char buffer[])
 	i = 0;
 	if (!line)
 		return ;
-	while (line[i] && !(line[i] == '\n' && !quote && !bracket))
+	while (line[i] && !(line[i] == '\n' && !quote && bracket <= 0))
 	{
 		if (quote && quote == line[i])
 			quote = 0;

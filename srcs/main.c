@@ -352,6 +352,31 @@ void print_snippet_list(t_snippet *head)
 	}
 }
 
+bool	is_syntaxe_ok(enum e_token prev, enum e_token token)
+{
+	if (prev == redir_in || prev == redir_out || prev == here_doc || prev == append)
+		return (token == word);
+	return (true);
+}
+
+bool	check_syntaxe(t_snippet *lst)
+{
+	enum e_token	prev;
+
+	prev = lst->token;
+	if (prev == semicolon || prev == pipe_delim || prev == closing_par || prev == or || prev == and)
+		return (ft_printf("error near: %c\n", lst->ptr[0]), false);
+	lst = lst->next;
+	while (lst && is_syntaxe_ok(prev, lst->token))
+	{
+		prev = lst->token;
+		lst = lst->next;
+	}
+	if (lst)
+		return (ft_printf("error near: %c\n", lst->ptr[0]), false);
+	return (true);
+}
+
 int	main(int ac, char **av, char **env)
 {
 	(void)ac; (void)av; (void)env;
@@ -404,7 +429,8 @@ int	main(int ac, char **av, char **env)
 				free(str);
 				break ;
 			}
-			expand_snip(&lst, lst->next->next, env, true);
+			//expand_snip(&lst, lst, env, true);
+			check_syntaxe(lst);
 			print_snippet_list(lst);
 		}
 		free(str);
