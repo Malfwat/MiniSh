@@ -139,4 +139,6 @@ int		dollar_len(char *str_dollar);
 void	expand_env_var(char **env, char *varname, int len);
 
 void	expand_token(char *ptr, char **env, int len, char scope);
+t_snippet	*lexer(char *str);
+void optimize_lst(t_snippet **head);
 #endif
