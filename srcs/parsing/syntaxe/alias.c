@@ -15,6 +15,8 @@ static bool	replace(t_snippet **head, t_snippet *snip, t_hash_table *table)
 	snip->ptr = ft_strdup(pair->value);
 	if (!snip->ptr)
 		return (false);
+
+	new_lst = lexer(pair->value);
 	// re-lexer le contenu de lst->ptr
 	// re-appeler pour les noms de fichier et redirs
 	return (true);
