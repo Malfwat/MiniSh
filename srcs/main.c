@@ -6,7 +6,7 @@
 /*   By: malfwa <admoufle@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 14:05:13 by malfwa            #+#    #+#             */
-/*   Updated: 2025/06/15 15:51:15 by malfwa           ###   ########.fr       */
+/*   Updated: 2025/06/18 17:10:35 by malfwa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -154,6 +154,36 @@ bool	simple_sep(char c)
 	return (false);
 }
 
+bool	is_redir(enum e_token token)
+{
+	return (token >= redir_in && token <= append);
+}
+
+bool	is_cntl_op(enum e_token token)
+{
+	return (token >= pipe_delim && token <= semicolon);
+}
+
+void optimize_lst(t_snippet **head)
+{
+	t_snippet	*ptr;
+	void		*tmp;
+
+	ptr = *head;
+	while (ptr)
+	{
+		if (is_redir(ptr->token) && ptr->next && ptr->next->token == word)
+		{
+			ptr->next->token = ptr->token;
+			tmp = ptr->next->next;
+			pop_snip(head, ptr);
+			ptr = tmp;
+
+		}
+		else
+			ptr = ptr->next;
+	}
+}
 
 const char *token_to_string(enum e_token token);
 
@@ -359,7 +389,9 @@ void print_snippet_list(t_snippet *head)
 
 bool	is_syntaxe_ok(enum e_token prev, enum e_token token)
 {
-	if (prev == redir_in || prev == redir_out || prev == here_doc || prev == append)
+	if (is_cntl_op(prev) && is_cntl_op(token))
+		return (false);
+	if (is_redir(prev))
 		return (token == word);
 	return (true);
 }
@@ -367,18 +399,23 @@ bool	is_syntaxe_ok(enum e_token prev, enum e_token token)
 bool	check_syntaxe(t_snippet *lst)
 {
 	enum e_token	prev;
+	char			*ptr;
 
 	prev = lst->token;
 	if (prev == semicolon || prev == pipe_delim || prev == closing_par || prev == or || prev == and)
 		return (ft_printf("minishell: syntax error near unexpected token `%c'\n", lst->ptr[0]), false);
 	lst = lst->next;
+	ptr = NULL;
 	while (lst && is_syntaxe_ok(prev, lst->token))
 	{
 		prev = lst->token;
+		ptr = lst->ptr;
 		lst = lst->next;
 	}
 	if (lst)
 		return (ft_printf("minishell: syntax error near unexpected token `%c'\n", lst->ptr[0]), false);
+	if (is_cntl_op(prev) || is_redir(prev) || (ptr && ptr[0] == '&'))
+		return (ft_printf("minishell: syntax error near unexpected token `%c'\n", ptr[0]), false);
 	return (true);
 }
 
@@ -437,7 +474,8 @@ int	main(int ac, char **av, char **env)
 				break ;
 			}
 			//expand_snip(&lst, lst, env, true);
-			check_syntaxe(lst);
+			if (check_syntaxe(lst))
+				optimize_lst(&lst);
 			print_snippet_list(lst);
 		}
 		free(str);

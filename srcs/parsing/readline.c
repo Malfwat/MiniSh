@@ -19,7 +19,7 @@ void	ms_rdl(char *prompt, int fd)
 		trim_trailling_ws(tmp);
 		ft_putstr_fd(tmp, fd);
 	}
-	if (is_opened(ptr))
+	if ((ptr && !*ptr) || is_opened(ptr))
 	{
 		free(ptr);
 		return (ms_rdl(prompt, fd));

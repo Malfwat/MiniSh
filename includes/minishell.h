@@ -77,6 +77,7 @@ typedef struct s_hash_table
 //Snippet
 
 t_snippet	*new_snip(enum e_token token, char *ptr);
+void	pop_snip(t_snippet **head, t_snippet *to_pop);
 bool	add_to_snip_lst(t_snippet **head, enum e_token, char *ptr);
 void	insert_snip(t_snippet *node, t_snippet *to_insert);
 t_snippet	*get_last_snip(t_snippet *lst);
