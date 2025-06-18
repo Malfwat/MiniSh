@@ -116,6 +116,10 @@ void	set_pair(t_hash_table *table, t_pair *pair);
 t_pair	*create_pair(char *str);
 void	remove_pair(t_hash_table *table, t_pair *pair);
 
+bool	is_redir(enum e_token token);
+bool	is_cntl_op(enum e_token token);
+bool	is_syntaxe_ok(enum e_token prev, enum e_token token);
+bool	check_syntaxe(t_snippet *lst);
 //Prompt
 
 bool	expand_prompt(t_prompt *prompt);
