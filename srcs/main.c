@@ -433,8 +433,8 @@ int	main(int ac, char **av, char **env)
 			//expand_snip(&lst, lst, env, true);
 			if (check_syntaxe(lst))
 			{
-				optimize_lst(&lst);
 				replace_aliases(&lst, &table);
+				optimize_lst(&lst);
 				print_snippet_list(lst);
 			}
 		}

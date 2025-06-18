@@ -27,22 +27,17 @@ char	*str_without_quote(char *str)
 	return (new_str);
 }
 
-static bool	replace(t_snippet **head, t_snippet *snip, t_hash_table *table)
+static bool	replace(t_snippet **head, t_snippet **snip, t_hash_table *table)
 {
 	t_pair		*pair;
 	t_snippet	*new_lst;
 	char		*tmp;
+	void		*ptr;
+	
 
-	(void)head;
-	(void)new_lst;
-
-	pair = get_pair(table, snip->ptr, ft_strlen(snip->ptr));
+	pair = get_pair(table, (*snip)->ptr, ft_strlen((*snip)->ptr));
 	if (!pair)
 		return (true);
-	free(snip->ptr);
-	snip->ptr = ft_strdup(pair->value);
-	if (!snip->ptr)
-		return (false);
 	tmp = str_without_quote(pair->value);
 	if (!tmp)
 		return (false);
@@ -50,13 +45,12 @@ static bool	replace(t_snippet **head, t_snippet *snip, t_hash_table *table)
 	free(tmp);
 	if (!new_lst)
 		return (false);
-	insert_snip(snip, new_lst);
-	pop_snip(head, snip);
-	optimize_lst(head);
+	ptr = get_last_snip(new_lst);
+	insert_snip(*snip, new_lst);
+	pop_snip(head, *snip);
+	*snip = ptr;
 	return (true);
 }
-
-// a appeler apres avoir fait le changement pour les redir et les noms de fichiers
 
 bool	replace_aliases(t_snippet **head, t_hash_table *table)
 {
@@ -74,7 +68,7 @@ bool	replace_aliases(t_snippet **head, t_hash_table *table)
 		else if (lst->token == closing_par)
 			bracket--;
 		if (lst->token == word && !bracket && (prev == -1 || is_cntl_op(prev)))
-			if (!replace(head, lst, table))
+			if (!replace(head, &lst, table))
 				return (false);
 		prev = lst->token;
 		lst = lst->next;
