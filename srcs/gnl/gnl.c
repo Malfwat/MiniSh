@@ -1,18 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   gnl.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: amouflet <amouflet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/28 22:18:56 by amouflet          #+#    #+#             */
-/*   Updated: 2022/12/04 16:01:14 by amouflet         ###   ########.fr       */
+/*   Updated: 2025/06/18 16:14:39 by malfwa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <stdlib.h>
 #include "minishell.h"
 #include "libftprintf.h"
+#include "get_next_line.h"
 
 char	*join_list(t_list *lst)
 {
@@ -59,7 +60,7 @@ static void	update_stash(char *line, char buffer[])
 	i = 0;
 	if (!line)
 		return ;
-	while (line[i] && !(line[i] == '\n' && !quote && bracket <= 0))
+	while (line[i] && !(line[i] == '\n' && !quote && bracket <= 0 && is_line_terminated(line, i)))
 	{
 		if (quote && quote == line[i])
 			quote = 0;

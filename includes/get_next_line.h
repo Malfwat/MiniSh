@@ -30,6 +30,7 @@
 # include <sys/stat.h>
 # include <fcntl.h>
 # include <limits.h>
+# include <stdbool.h>
 
 typedef struct s_stash
 {
@@ -39,6 +40,7 @@ typedef struct s_stash
 
 char	*get_next_line(int fd);
 char	*get_next_null(int fd);
+bool	is_line_terminated(char *line, int i);
 //char	*get_line(int fd, char *stash, char **line, t_buf *lst);
 //int		check_stash(char **stash, char	**line, char *new_stash, int i);
 //int		join_t_buf(t_buf **begin, char **stash, char **line);

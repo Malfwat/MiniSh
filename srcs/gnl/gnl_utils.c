@@ -1,6 +1,15 @@
 #include "libftprintf.h"
 #include <unistd.h>
 
+bool	is_line_terminated(char *buffer, int i)
+{
+	while (i && ((buffer[i] >= 9 && buffer[i] <= 13) || buffer[i] == ' '))
+		i--;
+	if (!i || (buffer[i-1] != '|' && buffer[i-1] != '&'))
+		return (true);
+	return (false);
+}
+
 bool	closed_word(char const buffer[], char *quote_ptr, int *bracket_ptr)
 {
 	int	i;
@@ -22,7 +31,7 @@ bool	closed_word(char const buffer[], char *quote_ptr, int *bracket_ptr)
 			else if (buffer[i] == ')')
 				(*bracket_ptr)--;
 			else if (buffer[i] == '\n' && !*bracket_ptr)
-				return (true);
+				return (is_line_terminated((char *)buffer, i));
 		}
 		i++;
 	}

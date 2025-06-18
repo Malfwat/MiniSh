@@ -26,7 +26,7 @@ t_snippet	*new_snip(enum e_token token, char *ptr)
 	return (new);
 }
 
-static t_snippet	*get_last_snip(t_snippet *lst)
+t_snippet	*get_last_snip(t_snippet *lst)
 {
 	if (!lst)
 		ft_putstr_fd("Check your code dumbass (get_last_snip)\n", 2);

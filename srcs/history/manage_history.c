@@ -13,7 +13,7 @@ void	trim_trailling_ws(char *str)
 		return ;
 	while (i > 0)
 	{
-		if (str[i - 1] != ' ' && str[i - 1] != '\t')
+		if ((str[i - 1] != ' ' && !(str[i - 1] >= 9 && str[i - 1] <= 13)) || str[i] == 10)
 			break ;
 		i--;
 	}

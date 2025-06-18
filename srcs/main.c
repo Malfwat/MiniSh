@@ -21,7 +21,10 @@ bool	is_opened(char *str)
 {
 	static char quote;
 	static int	bracket;
+	char		c;
+	char		d;
 
+	c = 0;
 	if (!str)
 		return (quote || bracket > 0);
 	while (*str)
@@ -39,9 +42,11 @@ bool	is_opened(char *str)
 			else if (*str == ')')
 				bracket--;
 		}
+		d = c;
+		c = *str;
 		str++;
 	}
-	return (quote || bracket > 0);
+	return (quote || bracket > 0 || c == '|' || (c == '&' && d == '&'));
 }
 
 int	closing_match(char *ptr);
@@ -92,7 +97,7 @@ int	word_len(char *str, bool (*is_sep)(char ), int len)
 		{
 			if (*str == '(' || *str == ')' || *str == ';')
 				return (1);
-			if (*str == '<' || *str == '>' || *str == '|')
+			if (*str == '<' || *str == '>' || *str == '|' || *str == '&')
 				return ((int []){1, 2}[str[0] == str[1]]);
 			i++;
 		}
@@ -365,7 +370,7 @@ bool	check_syntaxe(t_snippet *lst)
 
 	prev = lst->token;
 	if (prev == semicolon || prev == pipe_delim || prev == closing_par || prev == or || prev == and)
-		return (ft_printf("error near: %c\n", lst->ptr[0]), false);
+		return (ft_printf("minishell: syntax error near unexpected token `%c'\n", lst->ptr[0]), false);
 	lst = lst->next;
 	while (lst && is_syntaxe_ok(prev, lst->token))
 	{
@@ -373,7 +378,7 @@ bool	check_syntaxe(t_snippet *lst)
 		lst = lst->next;
 	}
 	if (lst)
-		return (ft_printf("error near: %c\n", lst->ptr[0]), false);
+		return (ft_printf("minishell: syntax error near unexpected token `%c'\n", lst->ptr[0]), false);
 	return (true);
 }
 
@@ -408,13 +413,15 @@ int	main(int ac, char **av, char **env)
 	// Getting .ms_history fd
 	history_fd = ms_get_history_fd();
 
+
 	// Main loop
 	while (1)
 	{
 		ret_val = get_cmd_line_fd(&fd, prompt_var, history_fd);
 		if (ret_val == -1)
 			break ;
-		str = gnl(fd);
+		//str = gnl(fd);
+		str = get_next_null(fd);
 		close(fd);
 		if (!str)
 			break ;
