@@ -33,19 +33,6 @@ static int	ft_count_word(char const *s, char *set)
 	return (count);
 }
 
-static void	*ft_free(char **tab)
-{
-	unsigned int	i;
-
-	i = 0;
-	if (!tab)
-		return (NULL);
-	while (tab[i])
-		free(tab[i++]);
-	free(tab);
-	return (NULL);
-}
-
 static int	ft_fill_tab(char **tab, char const *s, unsigned int *i, char *set)
 {
 	int	j;

@@ -26,12 +26,14 @@ static int	ft_count_word(char const *s, char c)
 	return (x);
 }
 
-static void	*ft_free(char **tab, unsigned int x)
+void	*ft_free(char **tab)
 {
 	unsigned int	i;
 
 	i = 0;
-	while (x > i)
+	if (!tab)
+		return (NULL);
+	while (tab[i])
 		free(tab[i++]);
 	free(tab);
 	return (NULL);
@@ -80,7 +82,7 @@ char	**ft_split(char const *s, char c)
 		while (s[i + len] != c && s[i + len] != 0)
 			len++;
 		if (ft_fill_tab(&(tab[x]), s, &i, c) == 1)
-			return (ft_free(tab, x));
+			return (ft_free(tab));
 		x++;
 	}
 	return (tab);
