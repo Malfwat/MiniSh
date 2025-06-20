@@ -6,7 +6,7 @@
 /*   By: malfwa <admoufle@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/20 18:24:28 by malfwa            #+#    #+#             */
-/*   Updated: 2025/06/20 21:05:53 by malfwa           ###   ########.fr       */
+/*   Updated: 2025/06/20 22:59:01 by malfwa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 
 void	ft_lstpop(t_list **head, t_list *to_pop)
 {
-	t_list	*lst;
+t_list	*lst;
 
 	lst = *head;
 	if (!to_pop || !head || !*head)
@@ -78,12 +78,13 @@ void	sort_lst(t_list *lst)
 	while (lst->next)
 	{
 		tmp = lst->next;
-		if (ft_strcmp(lst->content, tmp->content) > 0)
-		{
-			lst_swap(lst, tmp);
-			lst = head;
-		}
-		else
+		ft_printf("%s\n", (char *)lst->content);
+		//if (ft_strcmp(lst->content, tmp->content) > 0)
+		//{
+		//	lst_swap(lst, tmp);
+		//	lst = head;
+		//}
+		//else
 			lst = tmp;
 	}
 }
@@ -109,11 +110,13 @@ t_list	*get_all_files(void)
 		lst = ft_lstnew(file->d_name);
 		if (!lst)
 			return (ft_lstclear(&head, NULL), closedir(folder), NULL);
+		ft_printf("\t\t\t%s\n", (char *)lst->content);
 		ft_lstadd_back(&head, lst);
 		file = readdir(folder);
 	}
 	closedir(folder);
 	sort_lst(head);
+	ft_printf("je bokokokoucle");
 	return (head);
 }
 
@@ -164,8 +167,10 @@ t_snippet	*wildcard(char *raw_pattern)
 	head = get_all_files();
 	if (!head)
 		return (NULL);
+	ft_printf("je bousfhshcle");
 	if (is_only_wildcard(raw_pattern))
 		return (lst_to_snip(head, raw_pattern));
+			ft_printf("???");
 	patterns = ft_split(raw_pattern, '*');
 	if (!patterns)
 		return (ft_lstclear(&head, NULL), NULL);
@@ -181,4 +186,42 @@ t_snippet	*wildcard(char *raw_pattern)
 	ft_lstclear(&head, NULL);
 	ft_free(patterns);
 	return (snip);
+}
+
+bool	replace_wildcards(t_snippet **head)
+{
+	t_snippet	*lst;
+	t_snippet	*prev;
+	t_snippet	*new;
+	t_snippet	*last;
+
+	lst = *head;
+	prev = NULL;
+	while (lst)
+	{
+		if (ft_strchr(lst->ptr, '*'))
+		{
+			new = wildcard(lst->ptr);
+			ft_printf("!!!");
+			if (!new)
+				return (false);
+			last = get_last_snip(new);
+			last->next = lst->next;
+			if (!prev)
+				*head = new;
+			else
+				prev->next = new;
+			free(lst->ptr);
+			free(lst);
+			prev = last;
+			lst = last->next;
+		}
+		else
+		{
+			prev = lst;
+			lst = lst->next;
+		}
+		ft_printf("je boucle");
+	}
+	return (true);
 }

@@ -84,6 +84,7 @@ t_snippet	*get_last_snip(t_snippet *lst);
 void	free_snip_lst(t_snippet *lst);
 bool	expand_snip(t_snippet **head, t_snippet *to_expand, char **env, bool one_block);
 t_snippet	*wildcard(char *raw_pattern);
+bool	replace_wildcards(t_snippet **head);
 
 //Utils
 
