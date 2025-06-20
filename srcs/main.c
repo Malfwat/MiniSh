@@ -439,11 +439,11 @@ int	main(int ac, char **av, char **env)
 			}
 		}
 		free(str);
+		free_snip_lst(lst);
 		str = NULL;
 	}
 
 	// Freeing everything 
-	free_snip_lst(lst);
 	free_table(&table);
 	close(history_fd);
 	free(prev_cmdline);
