@@ -6,26 +6,17 @@
 /*   By: malfwa <admoufle@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/20 18:24:28 by malfwa            #+#    #+#             */
-/*   Updated: 2025/06/20 18:41:48 by malfwa           ###   ########.fr       */
+/*   Updated: 2025/06/20 21:05:53 by malfwa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-/*
-t_snippet	wildcard(char *str, char *cwd)
-{
-}*/
-
 #include <sys/types.h>
 #include <dirent.h>
 
-void	nothing(void *ptr)
-{return (void)ptr;}
-
-void	ft_lstpop(t_list **head, t_list *to_pop, void (*del)(void *))
+void	ft_lstpop(t_list **head, t_list *to_pop)
 {
 	t_list	*lst;
-	void	*next;
 
 	lst = *head;
 	if (!to_pop || !head || !*head)
@@ -39,20 +30,7 @@ void	ft_lstpop(t_list **head, t_list *to_pop, void (*del)(void *))
 		if (lst)
 			lst->next = to_pop->next;
 	}
-	if (del)
-	{
-		next = to_pop->next;
-		del(to_pop->content);
-		free(to_pop);
-	}
-}
-
-void	print_str(void *str)
-{
-	if (!str)
-		return ;
-	write(1, (char *)str, ft_strlen((char *)str));
-	write(1, "\n", 1);
+	free(to_pop);
 }
 
 bool	check_pattern(char *str, char **patterns, char *raw_pattern)
@@ -82,44 +60,125 @@ bool	check_pattern(char *str, char **patterns, char *raw_pattern)
 	return (true);
 }
 
-int	main(int ac, char **av)
+void	lst_swap(t_list *a, t_list *b)
 {
-	DIR	*folder;
-	struct dirent	*file;
-	char	**patterns;
-	t_list	*head;
-	t_list	*lst;
+	void	*tmp;
 
-	if (ac != 2)
-		return (1);
+	tmp = a->content;
+	a->content = b->content;
+	b->content = tmp;
+}
+
+void	sort_lst(t_list *lst)
+{
+	t_list	*head;
+	t_list	*tmp;
+
+	head = lst;
+	while (lst->next)
+	{
+		tmp = lst->next;
+		if (ft_strcmp(lst->content, tmp->content) > 0)
+		{
+			lst_swap(lst, tmp);
+			lst = head;
+		}
+		else
+			lst = tmp;
+	}
+}
+
+t_list	*get_all_files(void)
+{
+	DIR				*folder;
+	struct dirent	*file;
+	t_list			*head;
+	t_list			*lst;
+
 	folder = opendir(".");
 	if (!folder)
-		return (0);
-	head = NULL;
+		return (NULL);
 	file = readdir(folder);
 	while (file)
 	{
+		if (!ft_strcmp(file->d_name, ".") || !ft_strcmp(file->d_name, ".."))
+		{
+			file = readdir(folder);
+			continue ;
+		}
 		lst = ft_lstnew(file->d_name);
 		if (!lst)
-			return (0);
+			return (ft_lstclear(&head, NULL), closedir(folder), NULL);
 		ft_lstadd_back(&head, lst);
 		file = readdir(folder);
 	}
+	closedir(folder);
+	sort_lst(head);
+	return (head);
+}
 
-	patterns = ft_split(av[1], '*');
+bool	is_only_wildcard(char *str)
+{
+	int	i;
 
+	i = 0;
+	while (str[i] == '*')
+		i++;
+	return (!str[i]);
+}
+
+t_snippet	*lst_to_snip(t_list *lst, char *raw_pattern)
+{
+	t_snippet	*head;
+	char		*dup;
+
+	head = NULL;
+	if (!lst)
+	{
+		dup = ft_strdup(raw_pattern);
+		if (!dup)
+			return (NULL);
+		head = new_snip(word, dup);
+		if (!head)
+			free(dup);
+		return (head);
+	}
+	while (lst)
+	{
+		dup = ft_strdup(lst->content);
+		if (!dup || !add_to_snip_lst(&head, word, dup))
+			return (free(dup), free_snip_lst(head), NULL);
+		lst = lst->next;
+	}
+	return (head);
+}
+
+t_snippet	*wildcard(char *raw_pattern)
+{
+	char		**patterns;
+	t_snippet	*snip;
+	t_list		*head;
+	t_list		*next;
+	t_list		*lst;
+
+	head = get_all_files();
+	if (!head)
+		return (NULL);
+	if (is_only_wildcard(raw_pattern))
+		return (lst_to_snip(head, raw_pattern));
+	patterns = ft_split(raw_pattern, '*');
+	if (!patterns)
+		return (ft_lstclear(&head, NULL), NULL);
 	lst = head;
-	t_list	*next;
 	while (lst)
 	{
 		next = lst->next;
-		if (!check_pattern(lst->content, patterns, av[1]))
-			ft_lstpop(&head, lst, nothing);
+		if (!check_pattern(lst->content, patterns, raw_pattern))
+			ft_lstpop(&head, lst);
 		lst = next;
 	}
-	ft_lstiter(head, print_str);
-	closedir(folder);
-	ft_lstclear(&head, nothing);
+	snip = lst_to_snip(head, raw_pattern);
+	ft_lstclear(&head, NULL);
 	ft_free(patterns);
-	return (0);
+	return (snip);
 }

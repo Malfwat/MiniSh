@@ -6,7 +6,7 @@
 /*   By: malfwa <admoufle@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 14:05:13 by malfwa            #+#    #+#             */
-/*   Updated: 2025/06/18 17:36:51 by malfwa           ###   ########.fr       */
+/*   Updated: 2025/06/20 21:10:50 by malfwa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -434,6 +434,7 @@ int	main(int ac, char **av, char **env)
 			if (check_syntaxe(lst))
 			{
 				replace_aliases(&lst, &table);
+				replace_wildcards(&lst);
 				optimize_lst(&lst);
 				print_snippet_list(lst);
 			}
