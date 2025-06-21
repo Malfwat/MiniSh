@@ -1,5 +1,0 @@
-An alias is replaced when it is a cmd not an argument
-
-je dois verifier que les alias ne sont pas plusieur mots sans guillemets
-
-
