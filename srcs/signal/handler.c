@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   handler.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: malfwa <admoufle@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/06/21 17:15:55 by malfwa            #+#    #+#             */
+/*   Updated: 2025/06/21 17:17:20 by malfwa           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include <readline/readline.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -7,7 +19,8 @@
 
 __attribute__((constructor)) void	ms_set_sighandler(void)
 {
-	if (signal(SIGINT, SIG_IGN) == SIG_ERR || signal(SIGQUIT, SIG_IGN) == SIG_ERR)
+	if (signal(SIGINT, SIG_IGN) == SIG_ERR
+		|| signal(SIGQUIT, SIG_IGN) == SIG_ERR)
 		exit(EXIT_FAILURE);
 }
 
