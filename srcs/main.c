@@ -232,7 +232,7 @@ int	dollar_len(char *str)
 	if (!str || *str != '$')
 		return (0);
 	i = 1;
-	if (str[1] == '$')
+	if (str[1] == '?' || str[1] == '$')
 		return (2);
 	while (ft_isalnum(str[i]) || str[i] == '_')
 		i++;
@@ -330,10 +330,19 @@ void	expand_token(char *ptr, char **env, int len, char scope)
 			expand_token(ptr + 1, env, wlen - 2, *ptr);
 		else
 		{
-			if (*ptr == '$')
+			if (*ptr == '$' && wlen != 1)
 			{
-				tmp = expand(env, ptr + 1, wlen - 1);
-				dollar_expansion(tmp, scope, &quote);
+				if (wlen == 2 && !ft_strncmp("$?", ptr, wlen))
+				{
+					tmp = ft_itoa(/*ms->last_exit_value*/972);
+					dollar_expansion(tmp, scope, &quote);
+					free(tmp);
+				}
+				else
+				{
+					tmp = expand(env, ptr + 1, wlen - 1);
+					dollar_expansion(tmp, scope, &quote);
+				}
 			}
 			else
 				write_without_quote(ptr, wlen);
@@ -440,6 +449,7 @@ int	main(int ac, char **av, char **env)
 				replace_tilde(lst, getenv("HOME"));
 				replace_wildcards(&lst);
 				optimize_lst(&lst);
+									expand_snip(&lst, lst, env, true);
 				print_snippet_list(lst);
 			}
 		}

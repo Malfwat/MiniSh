@@ -127,7 +127,7 @@ bool	expand_snip(t_snippet **head, t_snippet *to_expand, char **env, bool one_bl
 		ft_printf("Weird things going on\n");
 	if (*head == to_expand)
 	{
-		if ((*head)->next)
+		if ((*head)->next && new_lst)
 			insert_snip(get_last_snip(new_lst), (*head)->next);
 		*head = new_lst;
 	}
