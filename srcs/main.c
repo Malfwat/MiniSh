@@ -406,8 +406,6 @@ int	main(int ac, char **av, char **env)
 
 
 	// Setting signals
-	if (!ms_set_sighandler())
-		return (ft_putendl_fd("Error setting signals", 2), 1);
 
 	// Getting .ms_history fd
 	history_fd = ms_get_history_fd();
@@ -436,7 +434,7 @@ int	main(int ac, char **av, char **env)
 				break ;
 			}
 			//expand_snip(&lst, lst, env, true);
-			if (check_syntaxe(lst))
+			if (check_syntaxe(lst, av[0]))
 			{
 				replace_aliases(&lst, &table);
 				replace_tilde(lst, getenv("HOME"));

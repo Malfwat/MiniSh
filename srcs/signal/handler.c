@@ -5,13 +5,10 @@
 #include "libft.h"
 #include <stdbool.h>
 
-bool	ms_set_sighandler(void)
+__attribute__((constructor)) void	ms_set_sighandler(void)
 {
-	if (signal(SIGINT, SIG_IGN) == SIG_ERR)
-		return (false);
-	if (signal(SIGQUIT, SIG_IGN) == SIG_ERR)
-		return (false);
-	return (true);
+	if (signal(SIGINT, SIG_IGN) == SIG_ERR || signal(SIGQUIT, SIG_IGN) == SIG_ERR)
+		exit(EXIT_FAILURE);
 }
 
 void	sigint_handler(int sig)

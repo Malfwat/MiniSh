@@ -104,7 +104,7 @@ void	trim_trailling_ws(char *str);
 
 void	sigint_handler(int sig);
 void	set_sigint_handler(int fds_to_close[2]);
-bool	ms_set_sighandler(void);
+//bool	ms_set_sighandler(void);
 
 //Parsing 
 
@@ -121,7 +121,7 @@ void	remove_pair(t_hash_table *table, t_pair *pair);
 bool	is_redir(enum e_token token);
 bool	is_cntl_op(enum e_token token);
 bool	is_syntaxe_ok(enum e_token prev, enum e_token token);
-bool	check_syntaxe(t_snippet *lst);
+bool	check_syntaxe(t_snippet *lst, char *exe);
 bool	replace_aliases(t_snippet **head, t_hash_table *table);
 bool	replace_tilde(t_snippet *lst, char *home);
 //Prompt

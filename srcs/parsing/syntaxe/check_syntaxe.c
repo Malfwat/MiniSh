@@ -35,15 +35,16 @@ bool	is_syntaxe_ok(enum e_token prev, enum e_token token)
 	return (true);
 }
 
-bool	check_syntaxe(t_snippet *lst)
+bool	check_syntaxe(t_snippet *lst, char *exe)
 {
 	enum e_token	prev;
 	int				bracket;
 	char			*ptr;
 
+	exe = _basename(exe);
 	prev = lst->token;
 	if (is_cntl_op(prev) || prev == closing_par)
-		return (ft_printf("minishell: syntax error near unexpected token `%s'\n", lst->ptr), false);
+		return (ft_printf("%s: syntax error near unexpected token `%s'\n", exe, lst->ptr), false);
 	lst = lst->next;
 	ptr = NULL;
 	bracket = (int []){0, 1}[prev == open_par];
@@ -58,11 +59,11 @@ bool	check_syntaxe(t_snippet *lst)
 		lst = lst->next;
 	}
 	if (bracket < 0)
-		return (ft_printf("minishell: syntax error near unexpected token `%c'\n", ')'), false);
+		return (ft_printf("%s: syntax error near unexpected token `%c'\n", exe, ')'), false);
 	if (lst)
-		return (ft_printf("minishell: syntax error near unexpected token `%s'\n", lst->ptr), false);
+		return (ft_printf("%s: syntax error near unexpected token `%s'\n", exe, lst->ptr), false);
 	if (is_cntl_op(prev) || is_redir(prev) || (ptr && ptr[0] == '&'))
-		return (ft_printf("minishell: syntax error near unexpected token `%s'\n", ptr), false);
+		return (ft_printf("%s: syntax error near unexpected token `%s'\n", exe, ptr), false);
 	return (true);
 }
 
