@@ -330,7 +330,7 @@ void	expand_token(char *ptr, char **env, int len, char scope)
 			expand_token(ptr + 1, env, wlen - 2, *ptr);
 		else
 		{
-			if (*ptr == '$' && wlen != 1)
+			if (*ptr == '$' && wlen != 1 && ft_strncmp("$$", ptr, 2))
 			{
 				if (wlen == 2 && !ft_strncmp("$?", ptr, wlen))
 				{
@@ -449,7 +449,6 @@ int	main(int ac, char **av, char **env)
 				replace_tilde(lst, getenv("HOME"));
 				replace_wildcards(&lst);
 				optimize_lst(&lst);
-									expand_snip(&lst, lst, env, true);
 				print_snippet_list(lst);
 			}
 		}
