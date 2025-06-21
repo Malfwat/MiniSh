@@ -30,6 +30,7 @@ t_list	*lst;
 		if (lst)
 			lst->next = to_pop->next;
 	}
+	free(to_pop->content);
 	free(to_pop);
 }
 
@@ -78,15 +79,15 @@ void	sort_lst(t_list *lst)
 	while (lst->next)
 	{
 		tmp = lst->next;
-		ft_printf("%s\n", (char *)lst->content);
-		//if (ft_strcmp(lst->content, tmp->content) > 0)
-		//{
-		//	lst_swap(lst, tmp);
-		//	lst = head;
-		//}
-		//else
-			lst = tmp;
+		if (ft_strcmp(lst->content, tmp->content) > 0)
+		{
+			lst_swap(lst, tmp);
+			lst = head;
+		}
+		else
+			lst = lst->next;
 	}
+	lst = head;
 }
 
 t_list	*get_all_files(void)
@@ -95,11 +96,13 @@ t_list	*get_all_files(void)
 	struct dirent	*file;
 	t_list			*head;
 	t_list			*lst;
+	char			*dup;
 
 	folder = opendir(".");
 	if (!folder)
 		return (NULL);
 	file = readdir(folder);
+	head = NULL;
 	while (file)
 	{
 		if (!ft_strcmp(file->d_name, ".") || !ft_strcmp(file->d_name, ".."))
@@ -107,16 +110,18 @@ t_list	*get_all_files(void)
 			file = readdir(folder);
 			continue ;
 		}
-		lst = ft_lstnew(file->d_name);
+		dup = ft_strdup(file->d_name);
+		if (!dup)
+			return (ft_lstclear(&head, free), closedir(folder), NULL);
+		lst = ft_lstnew(dup);
 		if (!lst)
-			return (ft_lstclear(&head, NULL), closedir(folder), NULL);
-		ft_printf("\t\t\t%s\n", (char *)lst->content);
+			return (free(dup), ft_lstclear(&head, free), closedir(folder), NULL);
 		ft_lstadd_back(&head, lst);
 		file = readdir(folder);
 	}
 	closedir(folder);
 	sort_lst(head);
-	ft_printf("je bokokokoucle");
+	lst = head;
 	return (head);
 }
 
@@ -148,9 +153,8 @@ t_snippet	*lst_to_snip(t_list *lst, char *raw_pattern)
 	}
 	while (lst)
 	{
-		dup = ft_strdup(lst->content);
-		if (!dup || !add_to_snip_lst(&head, word, dup))
-			return (free(dup), free_snip_lst(head), NULL);
+		if (!add_to_snip_lst(&head, word, lst->content))
+			return (free_snip_lst(head), NULL);
 		lst = lst->next;
 	}
 	return (head);
@@ -167,10 +171,12 @@ t_snippet	*wildcard(char *raw_pattern)
 	head = get_all_files();
 	if (!head)
 		return (NULL);
-	ft_printf("je bousfhshcle");
 	if (is_only_wildcard(raw_pattern))
-		return (lst_to_snip(head, raw_pattern));
-			ft_printf("???");
+	{
+		snip = lst_to_snip(head, raw_pattern);
+		ft_lstclear(&head, NULL);
+		return (snip);
+	}
 	patterns = ft_split(raw_pattern, '*');
 	if (!patterns)
 		return (ft_lstclear(&head, NULL), NULL);
@@ -202,7 +208,6 @@ bool	replace_wildcards(t_snippet **head)
 		if (ft_strchr(lst->ptr, '*'))
 		{
 			new = wildcard(lst->ptr);
-			ft_printf("!!!");
 			if (!new)
 				return (false);
 			last = get_last_snip(new);
@@ -221,7 +226,6 @@ bool	replace_wildcards(t_snippet **head)
 			prev = lst;
 			lst = lst->next;
 		}
-		ft_printf("je boucle");
 	}
 	return (true);
 }

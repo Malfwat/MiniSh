@@ -378,7 +378,6 @@ void print_snippet_list(t_snippet *head)
 
 int	main(int ac, char **av, char **env)
 {
-	(void)ac; (void)av; (void)env;
 
 	char		*str;
 	char		*prev_cmdline = NULL;
@@ -389,6 +388,12 @@ int	main(int ac, char **av, char **env)
 	t_snippet	*lst = NULL;
 	t_hash_table table;
 
+
+	(void)ac;(void)av;(void)env;
+
+	// Checking if we are in a tty
+	if (!isatty(STDIN_FILENO) || !isatty(STDOUT_FILENO) || !isatty(STDERR_FILENO))
+		return (1);
 
 	// Creating hash table and aliases
 	ft_bzero(&table, sizeof(table));
