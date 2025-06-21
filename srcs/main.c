@@ -439,6 +439,7 @@ int	main(int ac, char **av, char **env)
 			if (check_syntaxe(lst))
 			{
 				replace_aliases(&lst, &table);
+				replace_tilde(lst, getenv("HOME"));
 				replace_wildcards(&lst);
 				optimize_lst(&lst);
 				print_snippet_list(lst);

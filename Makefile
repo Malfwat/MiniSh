@@ -29,6 +29,7 @@ SRC	+=	utils/utils.c
 
 SRC	+=	parsing/readline.c\
 		parsing/hash.c\
+		parsing/tilde.c\
 		parsing/manage_rcfile.c\
 		parsing/snippet.c\
 		parsing/hash_utils.c\

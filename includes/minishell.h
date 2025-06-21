@@ -123,6 +123,7 @@ bool	is_cntl_op(enum e_token token);
 bool	is_syntaxe_ok(enum e_token prev, enum e_token token);
 bool	check_syntaxe(t_snippet *lst);
 bool	replace_aliases(t_snippet **head, t_hash_table *table);
+bool	replace_tilde(t_snippet *lst, char *home);
 //Prompt
 
 bool	expand_prompt(t_prompt *prompt);
