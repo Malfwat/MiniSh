@@ -97,16 +97,15 @@ bool	expand_snip(t_snippet **head, t_snippet *to_expand, char **env, bool one_bl
 
 
 	new_lst = NULL;
-	(void)head;
 
 	stdout_fd = dup(STDOUT_FILENO);
 	if (stdout_fd < 0 || pipe(pipe_fds) < 0)
 		return (false);
 	if (dup2(pipe_fds[1], STDOUT_FILENO) < 0)
 		return (close(pipe_fds[0]), close(pipe_fds[1]), false);
-	expand_token(to_expand->ptr, env, ft_strlen(to_expand->ptr), (char)one_block);
 
-			write(1, "\0", 1);
+	expand_token(to_expand->ptr, env, ft_strlen(to_expand->ptr), (char)one_block);
+	write(STDOUT_FILENO, "\0", 1);
 	close(pipe_fds[1]);
 	dup2(stdout_fd, STDOUT_FILENO);
 
@@ -123,13 +122,17 @@ bool	expand_snip(t_snippet **head, t_snippet *to_expand, char **env, bool one_bl
 	close(pipe_fds[0]);
 
 
-	if (!new_lst)
-		ft_printf("Weird things going on\n");
 	if (*head == to_expand)
 	{
 		if ((*head)->next && new_lst)
+		{
 			insert_snip(get_last_snip(new_lst), (*head)->next);
-		*head = new_lst;
+			*head = new_lst;
+		}
+		else if ((*head)->next)
+			*head = (*head)->next;
+		else
+			*head = new_lst;
 	}
 	else
 	{
@@ -138,7 +141,8 @@ bool	expand_snip(t_snippet **head, t_snippet *to_expand, char **env, bool one_bl
 		while (tmp->next != to_expand)
 			tmp = tmp->next;
 		tmp->next = to_expand->next;
-		insert_snip(tmp, new_lst);
+		if (new_lst)
+			insert_snip(tmp, new_lst);
 	}
 	free(to_expand->ptr);
 	free(to_expand);

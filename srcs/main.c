@@ -6,7 +6,7 @@
 /*   By: malfwa <admoufle@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 14:05:13 by malfwa            #+#    #+#             */
-/*   Updated: 2025/06/20 21:10:50 by malfwa           ###   ########.fr       */
+/*   Updated: 2025/06/22 19:38:23 by malfwa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,29 +19,23 @@
 
 bool	is_opened(char *str)
 {
-	static char quote;
+	static char	quote;
 	static int	bracket;
 	char		c;
 	char		d;
 
 	c = 0;
+	d = 0;
 	if (!str)
 		return (quote || bracket > 0);
 	while (*str)
 	{
-		if (quote == '\'' && *str == '\'')
-			quote = '\0';
-		else if (quote == '\"' && *str == '\"')
+		if ((quote == '\'' && *str == '\'') || (quote == '\"' && *str == '\"'))
 			quote = '\0';
 		else if (!quote && (*str == '\'' || *str == '\"'))
 			quote = *str;
-		else if (!quote)
-		{
-			if (*str == '(')
-				bracket++;
-			else if (*str == ')')
-				bracket--;
-		}
+		else if (!quote && (*str == '(' || *str == ')'))
+			bracket += (int []){-1, 1}[*str == '('];
 		d = c;
 		c = *str;
 		str++;
@@ -49,73 +43,7 @@ bool	is_opened(char *str)
 	return (quote || bracket > 0 || c == '|' || (c == '&' && d == '&'));
 }
 
-int	closing_match(char *ptr);
-
-int	find_closing_bracket(char *opening_bracket)
-{
-	char	*ptr;
-	int		i;
-
-	ptr = opening_bracket;
-	i = 1;
-	while (ptr[i] && ptr[i] != ')')
-	{
-		if (ptr[i] == '\'' || ptr[i] == '"')
-			i += closing_match(ptr + i);
-		else if (ptr[i] == '(')
-			i += find_closing_bracket(ptr + i);
-		i++;
-	}
-	return (i);
-}
-
-int	closing_match(char *ptr)
-{
-	char	*tmp;
-
-	if (*ptr == '\'' || *ptr == '"')
-	{
-		tmp = ft_strchr(ptr + 1, *ptr);
-		if (!tmp)
-			return (0);
-		return (tmp - ptr);
-	}
-	return (find_closing_bracket(ptr));
-}
-
-int	word_len(char *str, bool (*is_sep)(char ), int len)
-{
-	int		i;
-	int		tmp;
-
-	i = 0;
-	while (str[i] && i < len)
-	{
-		tmp = pass_whitespace(str + i) - (str + i);
-		i += tmp;
-		if (!i && is_sep(str[i]))
-		{
-			if (*str == '(' || *str == ')' || *str == ';')
-				return (1);
-			if (*str == '<' || *str == '>' || *str == '|' || *str == '&')
-				return ((int []){1, 2}[str[0] == str[1]]);
-			i++;
-		}
-		while (str[i] && !is_sep(str[i]) && !ft_strchr(OPENER, str[i]))
-			i++;
-		if (!str[i] || is_sep(str[i]))
-			return (i);
-		if (is_sep(str[i]) && *str == '$')
-			return (i);
-		if (!ft_strchr(str + i + 1, str[i]))
-			return (len);
-		tmp = closing_match(str + i);
-		i += tmp + 1;
-	}
-	return (i);
-}
-
-enum e_token get_token(char *str)
+enum e_token	get_token(char *str)
 {
 	if (!ft_strncmp(str, "<<", 2))
 		return (here_doc);
@@ -140,21 +68,7 @@ enum e_token get_token(char *str)
 	return (word);
 }
 
-bool	dollar_n_sep(char c)
-{
-	if (ft_strchr(SEP, c) || c == '$')
-		return (true);
-	return (false);
-}
-
-bool	simple_sep(char c)
-{
-	if (ft_strchr(SEP, c))
-		return (true);
-	return (false);
-}
-
-void optimize_lst(t_snippet **head)
+void	optimize_lst(t_snippet **head)
 {
 	t_snippet	*ptr;
 	void		*tmp;
@@ -168,14 +82,13 @@ void optimize_lst(t_snippet **head)
 			tmp = ptr->next->next;
 			pop_snip(head, ptr);
 			ptr = tmp;
-
 		}
 		else
 			ptr = ptr->next;
 	}
 }
 
-const char *token_to_string(enum e_token token);
+const char	*token_to_string(enum e_token token);
 
 t_snippet	*lexer(char *str)
 {
@@ -225,20 +138,6 @@ char	*expand(char **env, char *var_name, int len)
 	return (NULL);
 }
 
-int	dollar_len(char *str)
-{
-	int	i;
-
-	if (!str || *str != '$')
-		return (0);
-	i = 1;
-	if (str[1] == '?' || str[1] == '$')
-		return (2);
-	while (ft_isalnum(str[i]) || str[i] == '_')
-		i++;
-	return (i);
-}
-
 size_t	write_snip(char *str, char *quote, int len)
 {
 	int	i;
@@ -278,7 +177,7 @@ void	write_without_quote(char *str, int len)
 			ptr = ft_strchr(str, '\'');
 			len_to_write = ptr - str;
 			i += len_to_write + 2;
-			write(STDOUT_FILENO, str , len_to_write);
+			write(STDOUT_FILENO, str, len_to_write);
 			str = ptr;
 		}
 		str++;
@@ -286,10 +185,10 @@ void	write_without_quote(char *str, int len)
 	}
 }
 
-void	dollar_expansion(char *ptr, char scope, char *quote)
+void	dollar_exp(char *ptr, char scope, char *quote)
 {
 	size_t	test;
-	
+
 	if (ptr && !scope)
 	{
 		while (*ptr)
@@ -305,27 +204,24 @@ void	dollar_expansion(char *ptr, char scope, char *quote)
 		write_without_quote(ptr, ft_strlen(ptr));
 }
 
+void	put_to_zero(int *i, char *quote)
+{
+	if (i)
+		*i = 0;
+	if (quote)
+		*quote = 0;
+}
+
 void	expand_token(char *ptr, char **env, int len, char scope)
 {
-	char	*tmp;
 	int		wlen;
 	int		i;
-	char	quote = 0;
+	char	quote;
 
-
-	i = 0;
+	put_to_zero(&i, &quote);
 	while (*ptr && i < len)
 	{
-		// Getting the len to increment ptr
-		if (*ptr == '$')
-			wlen = dollar_len(ptr);
-		else if (*ptr == '\'' || *ptr == '"')
-			wlen = closing_match(ptr) + 1;
-		else
-			wlen = word_len(ptr, dollar_n_sep, len);
-
-
-		// Printing the new snip
+		wlen = get_wlen(ptr, len);
 		if (*ptr == '"')
 			expand_token(ptr + 1, env, wlen - 2, *ptr);
 		else
@@ -333,16 +229,9 @@ void	expand_token(char *ptr, char **env, int len, char scope)
 			if (*ptr == '$' && wlen != 1 && ft_strncmp("$$", ptr, 2))
 			{
 				if (wlen == 2 && !ft_strncmp("$?", ptr, wlen))
-				{
-					tmp = ft_itoa(/*ms->last_exit_value*/972);
-					dollar_expansion(tmp, scope, &quote);
-					free(tmp);
-				}
+					ft_putnbr_fd(972, STDOUT_FILENO);
 				else
-				{
-					tmp = expand(env, ptr + 1, wlen - 1);
-					dollar_expansion(tmp, scope, &quote);
-				}
+					dollar_exp(expand(env, ptr + 1, wlen - 1), scope, &quote);
 			}
 			else
 				write_without_quote(ptr, wlen);
@@ -352,26 +241,25 @@ void	expand_token(char *ptr, char **env, int len, char scope)
 	}
 }
 
-
 #include <stdio.h>
 
 const char *token_to_string(enum e_token token)
 {
 	switch (token)
 	{
-		case word: return "word";
-		case redir_in: return "redir_in";
-		case redir_out: return "redir_out";
-		case here_doc: return "here_doc";
-		case append: return "append";
-		case pipe_delim: return "pipe_delim";
-		case or: return "or";
-		case and: return "and";
-		case semicolon: return "semicolon";
-		case open_par: return "open_par";
-		case closing_par: return "closing_par";
-		case env_var: return "env_var";
-		default: return "unknown";
+		case word: return ("word");
+		case redir_in: return ("redir_in");
+		case redir_out: return ("redir_out");
+		case here_doc: return ("here_doc");
+		case append: return ("append");
+		case pipe_delim: return ("pipe_delim");
+		case or: return ("or");
+		case and: return ("and");
+		case semicolon: return ("semicolon");
+		case open_par: return ("open_par");
+		case closing_par: return ("closing_par");
+		case env_var: return ("env_var");
+		default: return ("unknown");
 	}
 }
 
@@ -384,19 +272,16 @@ void print_snippet_list(t_snippet *head)
 	}
 }
 
-
 int	main(int ac, char **av, char **env)
 {
-
-	char		*str;
-	char		*prev_cmdline = NULL;
-	int			fd;
-	int			history_fd;
-	int			ret_val;
-	t_prompt	prompt_var;
-	t_snippet	*lst = NULL;
-	t_hash_table table;
-
+	char			*str;
+	char			*prev_cmdline = NULL;
+	int				fd;
+	int				history_fd;
+	int				ret_val;
+	t_prompt		prompt_var;
+	t_snippet		*lst = NULL;
+	t_hash_table	table;
 
 	(void)ac;(void)av;(void)env;
 
@@ -413,12 +298,8 @@ int	main(int ac, char **av, char **env)
 	prompt_var.prompt_raw = "\\u@\\h:\\w\\$ ";
 	update_prompt_var(&prompt_var);
 
-
-	// Setting signals
-
 	// Getting .ms_history fd
-	history_fd = ms_get_history_fd();
-
+	history_fd = ms_get_history_fd(&prev_cmdline);
 
 	// Main loop
 	while (1)
@@ -442,14 +323,15 @@ int	main(int ac, char **av, char **env)
 				free(str);
 				break ;
 			}
-			//expand_snip(&lst, lst, env, true);
+			//expand_snip(&lst, lst, env, true); // would be done in exec
 			if (check_syntaxe(lst, av[0]))
 			{
 				replace_aliases(&lst, &table);
 				replace_tilde(lst, getenv("HOME"));
 				replace_wildcards(&lst);
 				optimize_lst(&lst);
-				print_snippet_list(lst);
+			expand_snip(&lst, lst, env, true); // would be done in exec
+				print_snippet_list(lst); // exec
 			}
 		}
 		free(str);

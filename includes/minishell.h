@@ -93,10 +93,12 @@ int		get_exit_value(int status);
 bool	is_child(pid_t pid);
 char	*_basename(char *str);
 void	print_until(char *str, char c, int fd);
+bool	dollar_n_sep(char c);
+bool	simple_sep(char c);
 
 //History
 
-int		ms_get_history_fd(void);
+int		ms_get_history_fd(char **ptr_oldcmd);
 void	ms_add_history(char *str, int fd, char **ptr_oldcmd);
 void	trim_trailling_ws(char *str);
 
@@ -124,6 +126,13 @@ bool	is_syntaxe_ok(enum e_token prev, enum e_token token);
 bool	check_syntaxe(t_snippet *lst, char *exe);
 bool	replace_aliases(t_snippet **head, t_hash_table *table);
 bool	replace_tilde(t_snippet *lst, char *home);
+
+int	closing_match(char *ptr);
+int	find_closing_bracket(char *opening_bracket);
+int	word_len(char *str, bool (*is_sep)(char ), int len);
+int	get_wlen(char *ptr, int len);
+int	dollar_len(char *str);
+
 //Prompt
 
 bool	expand_prompt(t_prompt *prompt);

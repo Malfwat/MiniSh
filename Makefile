@@ -6,7 +6,7 @@
 #    By: malfwa <admoufle@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/06/09 18:24:33 by malfwa            #+#    #+#              #
-#    Updated: 2025/06/20 21:04:32 by malfwa           ###   ########.fr        #
+#    Updated: 2025/06/22 19:17:14 by malfwa           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -25,13 +25,15 @@ SRC	+=	history/manage_history.c
 
 SRC	+=	signal/handler.c
 
-SRC	+=	utils/utils.c
+SRC	+=	utils/utils.c\
+		utils/sep_func.c
 
 SRC	+=	parsing/readline.c\
 		parsing/hash.c\
 		parsing/tilde.c\
 		parsing/manage_rcfile.c\
 		parsing/snippet.c\
+		parsing/word_len.c\
 		parsing/hash_utils.c\
 		parsing/syntaxe/check_syntaxe.c\
 		parsing/syntaxe/alias.c\

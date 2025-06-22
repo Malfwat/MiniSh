@@ -32,7 +32,7 @@ void	trim_trailling_ws(char *str)
 	str[i] = 0;
 }
 
-static bool	fill_history(int fd)
+static bool	fill_history(int fd, char **ptr_oldcmd)
 {
 	char	*str;
 	char	*ptr;
@@ -48,9 +48,11 @@ static bool	fill_history(int fd)
 		if (len >= 1 && ptr[len - 1] == '\n')
 			ptr[len - 1] = 0;
 		trim_trailling_ws(ptr);
-		if (*ptr)
+		if (*ptr && ft_strcmp(ptr, *ptr_oldcmd))
 		{
 			add_history(ptr);
+			free(*ptr_oldcmd);
+			*ptr_oldcmd = ft_strdup(ptr);
 		}
 		free(str);
 		str = gnl(fd);
@@ -58,7 +60,7 @@ static bool	fill_history(int fd)
 	return (true);
 }
 
-int	ms_get_history_fd(void)
+int	ms_get_history_fd(char **ptr_oldcmd)
 {
 	static int	fd;
 	char		*tmp;
@@ -75,7 +77,7 @@ int	ms_get_history_fd(void)
 		free(tmp);
 		if (fd < 0)
 			return (-1);
-		fill_history(fd);
+		fill_history(fd, ptr_oldcmd);
 	}
 	return (fd);
 }
