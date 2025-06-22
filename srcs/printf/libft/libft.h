@@ -6,7 +6,7 @@
 /*   By: admoufle <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/24 13:09:33 by admoufle          #+#    #+#             */
-/*   Updated: 2025/04/24 13:09:43 by admoufle         ###   ########.fr       */
+/*   Updated: 2025/06/22 20:02:04 by malfwa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,7 @@ size_t	ft_strlen(const char *s);
 size_t	ft_strlcat(char *dst, char *src, size_t size);
 size_t	ft_strlcpy(char *dst, const char *src, size_t size);
 int		ft_strncmp(const char *s1, const char *s2, size_t n);
+int		ft_strcmp_icase(const char *s1, const char *s2);
 int		ft_strcmp(const char *s1, const char *s2);
 void	*ft_calloc(size_t nmemb, size_t size);
 char	*ft_strdup(const char *s);

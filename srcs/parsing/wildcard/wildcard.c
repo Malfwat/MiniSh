@@ -6,7 +6,7 @@
 /*   By: malfwa <admoufle@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/20 18:24:28 by malfwa            #+#    #+#             */
-/*   Updated: 2025/06/20 22:59:01 by malfwa           ###   ########.fr       */
+/*   Updated: 2025/06/22 20:34:20 by malfwa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 
 void	ft_lstpop(t_list **head, t_list *to_pop)
 {
-t_list	*lst;
+	t_list	*lst;
 
 	lst = *head;
 	if (!to_pop || !head || !*head)
@@ -70,16 +70,33 @@ void	lst_swap(t_list *a, t_list *b)
 	b->content = tmp;
 }
 
+int	str_val(char *str)
+{
+	int	val;
+
+	val = 0;
+	while (*str)
+		val += *(str++);
+	return (val);
+}
+
 void	sort_lst(t_list *lst)
 {
 	t_list	*head;
 	t_list	*tmp;
+	int		cmp;
 
 	head = lst;
 	while (lst->next)
 	{
 		tmp = lst->next;
-		if (ft_strcmp(lst->content, tmp->content) > 0)
+		cmp = ft_strcmp_icase(lst->content, tmp->content);
+		if (cmp > 0)
+		{
+			lst_swap(lst, tmp);
+			lst = head;
+		}
+		else if (!cmp && str_val(lst->content) < str_val(tmp->content))
 		{
 			lst_swap(lst, tmp);
 			lst = head;
@@ -87,42 +104,48 @@ void	sort_lst(t_list *lst)
 		else
 			lst = lst->next;
 	}
-	lst = head;
+}
+
+t_list	*get_a_file(const char *name)
+{
+	t_list	*lst;
+	char	*dup;
+
+	dup = ft_strdup(name);
+	if (!dup)
+		return (NULL);
+	lst = ft_lstnew(dup);
+	if (!lst)
+		return (free(dup), NULL);
+	return (lst);
 }
 
 t_list	*get_all_files(void)
 {
-	DIR				*folder;
+	DIR				*dir;
 	struct dirent	*file;
 	t_list			*head;
 	t_list			*lst;
-	char			*dup;
 
-	folder = opendir(".");
-	if (!folder)
+	dir = opendir(".");
+	if (!dir)
 		return (NULL);
-	file = readdir(folder);
+	file = readdir(dir);
 	head = NULL;
 	while (file)
 	{
 		if (!ft_strcmp(file->d_name, ".") || !ft_strcmp(file->d_name, ".."))
 		{
-			file = readdir(folder);
+			file = readdir(dir);
 			continue ;
 		}
-		dup = ft_strdup(file->d_name);
-		if (!dup)
-			return (ft_lstclear(&head, free), closedir(folder), NULL);
-		lst = ft_lstnew(dup);
+		lst = get_a_file(file->d_name);
 		if (!lst)
-			return (free(dup), ft_lstclear(&head, free), closedir(folder), NULL);
+			return (ft_lstclear(&head, free), closedir(dir), NULL);
 		ft_lstadd_back(&head, lst);
-		file = readdir(folder);
+		file = readdir(dir);
 	}
-	closedir(folder);
-	sort_lst(head);
-	lst = head;
-	return (head);
+	return (sort_lst(head), closedir(dir), head);
 }
 
 bool	is_only_wildcard(char *str)
@@ -160,17 +183,49 @@ t_snippet	*lst_to_snip(t_list *lst, char *raw_pattern)
 	return (head);
 }
 
+void	take_off_hidden_files(t_list **head)
+{
+	t_list	*lst;
+	t_list	*next;
+
+	if (!head || !*head)
+		return ;
+	lst = *head;
+	while (lst)
+	{
+		next = lst->next;
+		if (*(char *)lst->content == '.')
+			ft_lstpop(head, lst);
+		lst = next;
+	}
+}
+
+void	pop_non_matching_files(t_list **head, char **patterns, char *raw_p)
+{
+	t_list	*lst;
+	t_list	*next;
+
+	lst = *head;
+	while (lst)
+	{
+		next = lst->next;
+		if (!check_pattern(lst->content, patterns, raw_p))
+			ft_lstpop(head, lst);
+		lst = next;
+	}
+}
+
 t_snippet	*wildcard(char *raw_pattern)
 {
 	char		**patterns;
 	t_snippet	*snip;
 	t_list		*head;
-	t_list		*next;
-	t_list		*lst;
 
 	head = get_all_files();
 	if (!head)
 		return (NULL);
+	if (*raw_pattern != '.')
+		take_off_hidden_files(&head);
 	if (is_only_wildcard(raw_pattern))
 	{
 		snip = lst_to_snip(head, raw_pattern);
@@ -180,26 +235,38 @@ t_snippet	*wildcard(char *raw_pattern)
 	patterns = ft_split(raw_pattern, '*');
 	if (!patterns)
 		return (ft_lstclear(&head, NULL), NULL);
-	lst = head;
-	while (lst)
-	{
-		next = lst->next;
-		if (!check_pattern(lst->content, patterns, raw_pattern))
-			ft_lstpop(&head, lst);
-		lst = next;
-	}
+	pop_non_matching_files(&head, patterns, raw_pattern);
 	snip = lst_to_snip(head, raw_pattern);
 	ft_lstclear(&head, NULL);
 	ft_free(patterns);
 	return (snip);
 }
 
+bool	replace_one_wildcard(t_snippet **head, t_snippet **lst, t_snippet *prev)
+{
+	t_snippet	*new;
+	t_snippet	*last;
+
+	new = wildcard((*lst)->ptr);
+	if (!new)
+		return (false);
+	last = get_last_snip(new);
+	last->next = (*lst)->next;
+	if (!prev)
+		*head = new;
+	else
+		prev->next = new;
+	free((*lst)->ptr);
+	free(*lst);
+	prev = last;
+	*lst = last->next;
+	return (true);
+}
+
 bool	replace_wildcards(t_snippet **head)
 {
 	t_snippet	*lst;
 	t_snippet	*prev;
-	t_snippet	*new;
-	t_snippet	*last;
 
 	lst = *head;
 	prev = NULL;
@@ -207,19 +274,8 @@ bool	replace_wildcards(t_snippet **head)
 	{
 		if (ft_strchr(lst->ptr, '*'))
 		{
-			new = wildcard(lst->ptr);
-			if (!new)
+			if (!replace_one_wildcard(head, &lst, prev))
 				return (false);
-			last = get_last_snip(new);
-			last->next = lst->next;
-			if (!prev)
-				*head = new;
-			else
-				prev->next = new;
-			free(lst->ptr);
-			free(lst);
-			prev = last;
-			lst = last->next;
 		}
 		else
 		{
