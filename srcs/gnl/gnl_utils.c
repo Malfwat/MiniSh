@@ -6,7 +6,7 @@
 /*   By: malfwa <admoufle@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/21 23:01:55 by malfwa            #+#    #+#             */
-/*   Updated: 2025/06/21 23:01:58 by malfwa           ###   ########.fr       */
+/*   Updated: 2025/06/22 21:34:08 by malfwa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ bool	is_line_terminated(char *buffer, int i)
 {
 	while (i && ((buffer[i] >= 9 && buffer[i] <= 13) || buffer[i] == ' '))
 		i--;
-	if (!i || (buffer[i-1] != '|' && buffer[i-1] != '&'))
+	if (!i || (buffer[i - 1] != '|' && buffer[i - 1] != '&'))
 		return (true);
 	return (false);
 }

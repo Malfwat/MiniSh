@@ -6,7 +6,7 @@
 /*   By: malfwa <admoufle@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/22 17:39:22 by malfwa            #+#    #+#             */
-/*   Updated: 2025/06/22 17:47:58 by malfwa           ###   ########.fr       */
+/*   Updated: 2025/06/22 21:28:29 by malfwa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,9 +87,8 @@ int	dollar_len(char *str)
 
 int	get_wlen(char *ptr, int len)
 {
-	int wlen;
+	int	wlen;
 
-	// Getting the len to increment ptr
 	if (*ptr == '$')
 		wlen = dollar_len(ptr);
 	else if (*ptr == '\'' || *ptr == '"')

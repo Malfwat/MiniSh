@@ -6,7 +6,7 @@
 /*   By: malfwa <admoufle@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/21 23:01:44 by malfwa            #+#    #+#             */
-/*   Updated: 2025/06/21 23:01:46 by malfwa           ###   ########.fr       */
+/*   Updated: 2025/06/22 21:35:55 by malfwa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ void	trim_trailling_ws(char *str)
 		return ;
 	while (i > 0)
 	{
-		if ((str[i - 1] != ' ' && !(str[i - 1] >= 9 && str[i - 1] <= 13)) || str[i] == 10)
+		if (!is_white_space(str[i - 1]) || str[i] == 10)
 			break ;
 		i--;
 	}

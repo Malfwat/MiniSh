@@ -6,7 +6,7 @@
 /*   By: malfwa <admoufle@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/21 23:00:00 by malfwa            #+#    #+#             */
-/*   Updated: 2025/06/21 23:00:02 by malfwa           ###   ########.fr       */
+/*   Updated: 2025/06/22 21:32:14 by malfwa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,28 +32,23 @@ bool	get_fd(int *fd)
 
 bool	alias_open(char *str)
 {
-	char quote;
-	int	bracket;
+	char	quote;
+	int		bracket;
 
 	quote = 0;
 	bracket = 0;
-
 	if (!str)
 		return (false);
 	while (*str)
 	{
-		if (quote == '\'' && *str == '\'')
-			quote = '\0';
-		else if (quote == '\"' && *str == '\"')
+		if ((quote == '\'' && *str == '\'') || (quote == '\"' && *str == '\"'))
 			quote = '\0';
 		else if (!quote && (*str == '\'' || *str == '\"'))
 			quote = *str;
 		else if (!quote)
 		{
-			if (*str == '(')
-				bracket++;
-			else if (*str == ')')
-				bracket--;
+			if (*str == '(' || *str == ')')
+				bracket += (int []){-1, 1}[*str == '('];
 		}
 		str++;
 	}
@@ -94,7 +89,7 @@ void	alias(t_hash_table *table, char *str)
 {
 	char	*ptr;
 	t_pair	*new;
-	
+
 	if (is_alias_cmd(str, &ptr))
 	{
 		new = create_pair(ptr);
@@ -149,6 +144,7 @@ int	bi_alias(int ac, char **av,int fds[2], t_ms *ms)
 	return (0);
 }
 */
+
 void	parse_rc(t_hash_table *table)
 {
 	char	*str;

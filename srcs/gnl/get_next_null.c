@@ -6,7 +6,7 @@
 /*   By: amouflet <amouflet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/28 22:18:56 by amouflet          #+#    #+#             */
-/*   Updated: 2025/06/21 23:02:19 by malfwa           ###   ########.fr       */
+/*   Updated: 2025/06/22 21:39:49 by malfwa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,8 +39,6 @@ static void	cpy(char **stash, char **line, t_buf *tmp)
 		*stash = NULL;
 	}
 }
-
-#include <stdio.h>
 
 static int	join_t_buf(t_buf **begin, char **stash, char **line)
 {
@@ -94,10 +92,7 @@ static int	check_stash(char **stash, char	**line, char *new_stash, int i)
 	return (1);
 }
 
-
-int	in_str_len(char *str, char c, int len);
-
-static char	*get_line(int fd, char *stash, char **line, t_buf *lst)
+static char	*get_line(int fd, char *stash, char **line, t_buf *lst) // a revoir t'as zappe ce que ca fait merde
 {
 	int	nb_read;
 	int	go;

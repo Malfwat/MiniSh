@@ -6,7 +6,7 @@
 /*   By: amouflet <amouflet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/28 22:18:56 by amouflet          #+#    #+#             */
-/*   Updated: 2025/06/18 16:14:39 by malfwa           ###   ########.fr       */
+/*   Updated: 2025/06/22 21:36:42 by malfwa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,8 @@ static void	update_stash(char *line, char buffer[])
 	i = 0;
 	if (!line)
 		return ;
-	while (line[i] && !(line[i] == '\n' && !quote && bracket <= 0 && is_line_terminated(line, i)))
+	while (line[i] && !(line[i] == '\n' && !quote && bracket <= 0
+			&& is_line_terminated(line, i)))
 	{
 		if (quote && quote == line[i])
 			quote = 0;

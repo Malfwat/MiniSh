@@ -6,7 +6,7 @@
 /*   By: malfwa <admoufle@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 14:05:13 by malfwa            #+#    #+#             */
-/*   Updated: 2025/06/22 19:38:23 by malfwa           ###   ########.fr       */
+/*   Updated: 2025/06/22 21:27:23 by malfwa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -324,7 +324,7 @@ int	main(int ac, char **av, char **env)
 				break ;
 			}
 			//expand_snip(&lst, lst, env, true); // would be done in exec
-			if (check_syntaxe(lst, av[0]))
+			if (check_syntaxe(lst, _basename(av[0])))
 			{
 				replace_aliases(&lst, &table);
 				replace_tilde(lst, getenv("HOME"));

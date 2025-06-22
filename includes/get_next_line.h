@@ -6,7 +6,7 @@
 /*   By: amouflet <amouflet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/28 22:19:30 by amouflet          #+#    #+#             */
-/*   Updated: 2022/12/03 15:30:10 by amouflet         ###   ########.fr       */
+/*   Updated: 2025/06/22 21:38:27 by malfwa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,5 +50,6 @@ int		free_lst(t_buf **lst);
 size_t	ft_strlcpy(char *dst, const char *src, size_t size);
 void	empty_gnl(int fd);
 char	*gnl(int fd);
+int		in_str_len(char *str, char c, int len);
 
 #endif /*GET_NEXT_LINE_H*/

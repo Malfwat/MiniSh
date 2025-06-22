@@ -6,7 +6,7 @@
 /*   By: malfwa <admoufle@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/21 23:00:22 by malfwa            #+#    #+#             */
-/*   Updated: 2025/06/21 23:00:24 by malfwa           ###   ########.fr       */
+/*   Updated: 2025/06/22 21:28:35 by malfwa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,4 +37,3 @@ bool	replace_tilde(t_snippet *lst, char *home)
 	}
 	return (true);
 }
-

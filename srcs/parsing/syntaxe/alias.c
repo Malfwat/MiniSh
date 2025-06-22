@@ -6,7 +6,7 @@
 /*   By: malfwa <admoufle@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/21 23:00:33 by malfwa            #+#    #+#             */
-/*   Updated: 2025/06/21 23:00:36 by malfwa           ###   ########.fr       */
+/*   Updated: 2025/06/22 21:10:11 by malfwa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,6 @@ static bool	replace(t_snippet **head, t_snippet **snip, t_hash_table *table)
 	t_snippet	*new_lst;
 	char		*tmp;
 	void		*ptr;
-	
 
 	pair = get_pair(table, (*snip)->ptr, ft_strlen((*snip)->ptr));
 	if (!pair)
