@@ -6,7 +6,7 @@
 /*   By: malfwa <admoufle@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/21 23:01:44 by malfwa            #+#    #+#             */
-/*   Updated: 2025/06/22 21:35:55 by malfwa           ###   ########.fr       */
+/*   Updated: 2025/06/23 11:40:05 by malfwa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,9 +40,11 @@ static bool	fill_history(int fd, char **ptr_oldcmd)
 
 	if (fd < 0)
 		return (false);
-	str = gnl(fd);
-	while (str)
+	str = get_next_null(fd);
+	int i= 0;
+	while (str && i++ < 5)
 	{
+		ft_printf("Debug [%s][%d]\n", str, *str);
 		ptr = pass_whitespace(str);
 		len = ft_strlen(ptr);
 		if (len >= 1 && ptr[len - 1] == '\n')
@@ -55,7 +57,7 @@ static bool	fill_history(int fd, char **ptr_oldcmd)
 			*ptr_oldcmd = ft_strdup(ptr);
 		}
 		free(str);
-		str = gnl(fd);
+		str = get_next_null(fd);
 	}
 	return (true);
 }
@@ -97,6 +99,7 @@ void	ms_add_history(char *str, int fd, char **ptr_oldcmd)
 		*ptr_oldcmd = ft_strdup(ptr);
 		if (fd < 0)
 			return ;
-		ft_putendl_fd(ptr, fd);
+		ft_putstr_fd(ptr, fd);
+		ft_putchar_fd(0, fd);
 	}
 }

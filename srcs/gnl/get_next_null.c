@@ -6,7 +6,7 @@
 /*   By: amouflet <amouflet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/28 22:18:56 by amouflet          #+#    #+#             */
-/*   Updated: 2025/06/23 10:13:33 by malfwa           ###   ########.fr       */
+/*   Updated: 2025/06/23 11:36:45 by malfwa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,17 +22,21 @@ static void	cpy(char **stash, char **line, t_buf *tmp)
 	while (tmp != NULL)
 	{
 		j = 0;
-		while (tmp->str && (tmp->str)[j] && j < BUFFER_SIZE)
+		while (tmp->str && tmp->str[j] && j < BUFFER_SIZE)
 			(*line)[i++] = tmp->str[j++];
-		if (!tmp->str[j])
-			(*line)[i++] = tmp->str[j++];
-		if (tmp->next == NULL)
+		if (j != BUFFER_SIZE)
 			break ;
 		tmp = tmp->next;
 	}
 	(*line)[i] = 0;
-	if (tmp && j < BUFFER_SIZE && tmp->str[j] != 0)
-		ft_strlcpy(*stash, &(tmp->str)[j], BUFFER_SIZE + 1);
+	if (tmp && j < BUFFER_SIZE && tmp->str[j] == 0)
+	{
+		i = 0;
+		while (++j < BUFFER_SIZE)
+			(*stash)[i++] = tmp->str[j];
+		while (i < BUFFER_SIZE)
+			(*stash)[i++] = 0;
+	}
 	else
 	{
 		free(*stash);
@@ -71,7 +75,7 @@ static int	check_stash(char **stash, char	**line, char *new_stash, int i)
 {
 	while (*stash && (*stash)[i] && i < BUFFER_SIZE)
 		i++;
-	if (i == 0 || !(*stash) || (*stash)[i] == 0)
+	if (!i || !(*stash) || i == BUFFER_SIZE)
 		return (0);
 	*line = malloc(sizeof(char) * (i + 2));
 	if (!*line)
@@ -92,14 +96,13 @@ static int	check_stash(char **stash, char	**line, char *new_stash, int i)
 	return (1);
 }
 
-
 static char	*get_line(int fd, char *stash, char **line, t_buf *lst)
 {
 	int	nb_read;
 	int	go;
 
 	nb_read = 1;
-	if (stash[0] != 0)
+	if (*stash)
 	{
 		if (check_stash(&stash, line, NULL, 0) == -1)
 			return (NULL);
@@ -112,9 +115,9 @@ static char	*get_line(int fd, char *stash, char **line, t_buf *lst)
 	while (nb_read > 0 && (in_str_len(stash, '\0', BUFFER_SIZE) == -1 || !go++))
 	{
 		nb_read = read_null_terminated(fd, stash, BUFFER_SIZE);
-		if (nb_read > 0 && new_elem_back(&lst, stash) == -1)
+		if (nb_read < 0 || new_elem_back(&lst, stash) == -1)
 			return (NULL);
-		if (nb_read <= 0)
+		if (!nb_read)
 			stash = ft_free_null(stash);
 	}
 	return (join_t_buf(&lst, &stash, line), stash);

@@ -94,8 +94,8 @@ bool		add_to_snip_lst(t_snippet **head, enum e_token token, char *ptr);
 void		insert_snip(t_snippet *node, t_snippet *to_insert);
 t_snippet	*get_last_snip(t_snippet *lst);
 void		free_snip_lst(t_snippet *lst);
-bool		expand_snip(t_snippet **head, t_snippet *to_expand,
-				char **env, bool one_block);
+bool		expand_snip(t_snippet **head, t_snippet *exp,
+				char **env, bool one_blk);
 t_snippet	*wildcard(char *raw_pattern);
 bool		replace_wildcards(t_snippet **head);
 

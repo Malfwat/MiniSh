@@ -6,7 +6,7 @@
 /*   By: malfwa <admoufle@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 14:05:13 by malfwa            #+#    #+#             */
-/*   Updated: 2025/06/22 21:27:23 by malfwa           ###   ########.fr       */
+/*   Updated: 2025/06/23 11:37:35 by malfwa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -195,7 +195,7 @@ void	dollar_exp(char *ptr, char scope, char *quote)
 		{
 			test = write_snip(ptr, quote, ft_strlen(ptr));
 			if (test != ft_strlen(ptr))
-				write(1, "\n", 1);
+				write(1, "\0", 1);
 			ptr += test;
 			ptr = pass_whitespace(ptr);
 		}
@@ -277,7 +277,7 @@ int	main(int ac, char **av, char **env)
 	char			*str;
 	char			*prev_cmdline = NULL;
 	int				fd;
-	int				history_fd;
+	int				history_fd = -1;
 	int				ret_val;
 	t_prompt		prompt_var;
 	t_snippet		*lst = NULL;
@@ -330,7 +330,7 @@ int	main(int ac, char **av, char **env)
 				replace_tilde(lst, getenv("HOME"));
 				replace_wildcards(&lst);
 				optimize_lst(&lst);
-			expand_snip(&lst, lst, env, true); // would be done in exec
+			expand_snip(&lst, lst, env, false); // would be done in exec
 				print_snippet_list(lst); // exec
 			}
 		}

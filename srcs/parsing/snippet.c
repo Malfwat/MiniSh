@@ -6,7 +6,7 @@
 /*   By: malfwa <admoufle@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/13 20:49:29 by malfwa            #+#    #+#             */
-/*   Updated: 2025/06/18 16:51:50 by malfwa           ###   ########.fr       */
+/*   Updated: 2025/06/23 11:41:51 by malfwa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,38 +89,42 @@ void	free_snip_lst(t_snippet *lst)
 	}
 }
 
-bool	expand_snip(t_snippet **head, t_snippet *to_expand, char **env, bool one_block)
+int	expand_in_pipe(char *str, char **env, bool one_block)
 {
 	int	stdout_fd;
 	int	pipe_fds[2];
-	t_snippet	*new_lst;
-
-
-	new_lst = NULL;
 
 	stdout_fd = dup(STDOUT_FILENO);
 	if (stdout_fd < 0 || pipe(pipe_fds) < 0)
-		return (false);
+		return (-1);
 	if (dup2(pipe_fds[1], STDOUT_FILENO) < 0)
-		return (close(pipe_fds[0]), close(pipe_fds[1]), false);
-
-	expand_token(to_expand->ptr, env, ft_strlen(to_expand->ptr), (char)one_block);
+		return (close(pipe_fds[0]), close(pipe_fds[1]), -1);
+	expand_token(str, env, ft_strlen(str), (char)one_block);
 	write(STDOUT_FILENO, "\0", 1);
 	close(pipe_fds[1]);
 	dup2(stdout_fd, STDOUT_FILENO);
+	return (pipe_fds[0]);
+}
 
+bool	get_snips_expanded(t_snippet **new_lst, int fd)
+{
+	char	*str;
 
-	char *str = get_next_null(pipe_fds[0]);
+	str = get_next_null(fd);
 	while (str)
 	{
 		if (*str && str[ft_strlen(str) - 1] == '\n')
 			str[ft_strlen(str) - 1] = 0;
-		if (!add_to_snip_lst(&new_lst, word, str))
-			return (free_snip_lst(new_lst), false);
-		str = get_next_null(pipe_fds[0]);
+		if (!add_to_snip_lst(new_lst, word, str))
+			return (free_snip_lst(*new_lst), false);
+		str = get_next_null(fd);
 	}
-	close(pipe_fds[0]);
+	return (true);
+}
 
+void	pop_n_insert(t_snippet **head, t_snippet *to_expand, t_snippet *new_lst)
+{
+	t_snippet	*tmp;
 
 	if (*head == to_expand)
 	{
@@ -136,7 +140,6 @@ bool	expand_snip(t_snippet **head, t_snippet *to_expand, char **env, bool one_bl
 	}
 	else
 	{
-		t_snippet *tmp;
 		tmp = *head;
 		while (tmp->next != to_expand)
 			tmp = tmp->next;
@@ -144,7 +147,22 @@ bool	expand_snip(t_snippet **head, t_snippet *to_expand, char **env, bool one_bl
 		if (new_lst)
 			insert_snip(tmp, new_lst);
 	}
-	free(to_expand->ptr);
-	free(to_expand);
+}
+
+bool	expand_snip(t_snippet **head, t_snippet *exp, char **env, bool one_blk)
+{
+	t_snippet	*new_lst;
+	int			fd;
+
+	new_lst = NULL;
+	if (!exp)
+		return (false);
+	fd = expand_in_pipe(exp->ptr, env, one_blk);
+	if (!get_snips_expanded(&new_lst, fd))
+		return (close(fd), false);
+	close(fd);
+	pop_n_insert(head, exp, new_lst);
+	free(exp->ptr);
+	free(exp);
 	return (true);
 }

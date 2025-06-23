@@ -6,7 +6,7 @@
 /*   By: amouflet <amouflet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/02 01:14:47 by malfwa            #+#    #+#             */
-/*   Updated: 2025/06/23 09:58:31 by malfwa           ###   ########.fr       */
+/*   Updated: 2025/06/23 11:35:29 by malfwa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,10 +61,7 @@ t_buf	*gnl_new_elem(char *buf)
 	new->str = malloc(sizeof(char) * (BUFFER_SIZE + 1));
 	if (!new->str)
 		return (free(new), NULL);
-	while (buf && buf[++i])
-		(new->str)[i] = buf[i];
-	while (i < BUFFER_SIZE)
-		(new->str)[i++] = 0;
+	ft_memcpy(new->str, buf, BUFFER_SIZE + 1);
 	new->next = NULL;
 	return (new);
 }
