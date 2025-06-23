@@ -6,7 +6,7 @@
 /*   By: admoufle <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/24 13:09:33 by admoufle          #+#    #+#             */
-/*   Updated: 2025/06/22 20:02:04 by malfwa           ###   ########.fr       */
+/*   Updated: 2025/06/23 10:12:40 by malfwa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,7 @@ char	*ft_strchr(const char *s, int c);
 char	*ft_strchr_len(const char *s, int c, int len);
 char	*ft_strnstr(const char *big, const char *little, size_t len);
 size_t	ft_strlen(const char *s);
+size_t	ft_strval(char *str);
 size_t	ft_strlcat(char *dst, char *src, size_t size);
 size_t	ft_strlcpy(char *dst, const char *src, size_t size);
 int		ft_strncmp(const char *s1, const char *s2, size_t n);
@@ -66,13 +67,16 @@ int		ft_lstsize(t_list *lst);
 t_list	*ft_lstlast(t_list *lst);
 void	ft_lstadd_back(t_list **lst, t_list *new);
 void	ft_lstdelone(t_list *lst, void (*del)(void *));
+void	ft_lstdelpop(t_list **head, t_list *to_pop, void (*del)(void *));
 void	ft_lstclear(t_list **lst, void (*del)(void *));
 void	ft_lstiter(t_list *lst, void (*f)(void *));
 char	*ft_strtrim(char const *s1, char const *set);
 t_list	*ft_lstmap(t_list *lst, void *(*f)(void *), void (*del)(void *));
+void	ft_lstsort(t_list *lst);
 char	**ft_split(char const *s, char c);
 void	*ft_free(char **tab);
 char	**ft_split_set(char const *s, char *set);
 void	ft_putendl_fd(char *s, int fd);
+void	*ft_free_null(void *ptr);
 
 #endif /*LIBFT_H*/

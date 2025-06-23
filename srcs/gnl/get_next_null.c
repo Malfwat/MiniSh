@@ -6,7 +6,7 @@
 /*   By: amouflet <amouflet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/28 22:18:56 by amouflet          #+#    #+#             */
-/*   Updated: 2025/06/22 21:39:49 by malfwa           ###   ########.fr       */
+/*   Updated: 2025/06/23 10:13:33 by malfwa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,7 +92,8 @@ static int	check_stash(char **stash, char	**line, char *new_stash, int i)
 	return (1);
 }
 
-static char	*get_line(int fd, char *stash, char **line, t_buf *lst) // a revoir t'as zappe ce que ca fait merde
+
+static char	*get_line(int fd, char *stash, char **line, t_buf *lst)
 {
 	int	nb_read;
 	int	go;
@@ -110,15 +111,11 @@ static char	*get_line(int fd, char *stash, char **line, t_buf *lst) // a revoir 
 	go = 0;
 	while (nb_read > 0 && (in_str_len(stash, '\0', BUFFER_SIZE) == -1 || !go++))
 	{
-		nb_read = read(fd, stash, BUFFER_SIZE);
-		stash[(nb_read >= 0) * nb_read] = 0;
+		nb_read = read_null_terminated(fd, stash, BUFFER_SIZE);
 		if (nb_read > 0 && new_elem_back(&lst, stash) == -1)
 			return (NULL);
 		if (nb_read <= 0)
-		{
-			free(stash);
-			stash = NULL;
-		}
+			stash = ft_free_null(stash);
 	}
 	return (join_t_buf(&lst, &stash, line), stash);
 }

@@ -6,7 +6,7 @@
 /*   By: malfwa <admoufle@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/21 23:01:55 by malfwa            #+#    #+#             */
-/*   Updated: 2025/06/22 21:34:08 by malfwa           ###   ########.fr       */
+/*   Updated: 2025/06/23 10:04:33 by malfwa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,19 +48,6 @@ bool	closed_word(char const buffer[], char *quote_ptr, int *bracket_ptr)
 		i++;
 	}
 	return (false);
-}
-
-int	read_null_terminated(int fd, char *buffer, int buffer_size)
-{
-	int	nb_bytes;
-
-	if (fd < 0 || buffer_size < 1)
-		return (-1);
-	nb_bytes = read(fd, buffer, buffer_size);
-	if (nb_bytes < 0)
-		return (-1);
-	buffer[nb_bytes] = 0;
-	return (nb_bytes);
 }
 
 bool	add_in_list(char buffer[], t_list **head)

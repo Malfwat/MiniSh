@@ -6,7 +6,7 @@
 /*   By: amouflet <amouflet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/28 22:19:30 by amouflet          #+#    #+#             */
-/*   Updated: 2025/06/22 21:38:27 by malfwa           ###   ########.fr       */
+/*   Updated: 2025/06/23 09:58:41 by malfwa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,10 +45,10 @@ bool	is_line_terminated(char *line, int i);
 //int		check_stash(char **stash, char	**line, char *new_stash, int i);
 //int		join_t_buf(t_buf **begin, char **stash, char **line);
 int		new_elem_back(t_buf **begin, char *buf);
-int		in_str(char *str, char c);
 int		free_lst(t_buf **lst);
 size_t	ft_strlcpy(char *dst, const char *src, size_t size);
 void	empty_gnl(int fd);
+int		read_null_terminated(int fd, char *buffer, int buffer_size);
 char	*gnl(int fd);
 int		in_str_len(char *str, char c, int len);
 

@@ -6,11 +6,12 @@
 /*   By: amouflet <amouflet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/02 01:14:47 by malfwa            #+#    #+#             */
-/*   Updated: 2022/12/03 14:53:26 by amouflet         ###   ########.fr       */
+/*   Updated: 2025/06/23 09:58:31 by malfwa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
+#include "libft.h"
 
 int	free_lst(t_buf **lst)
 {
@@ -40,20 +41,6 @@ int	in_str_len(char *str, char c, int len)
 	if (!str)
 		return (-1);
 	while (i < len)
-	{
-		if (str[i] == c)
-			return (i);
-		i++;
-	}
-	return (-1);
-}
-
-int	in_str(char *str, char c)
-{
-	int	i;
-
-	i = 0;
-	while (str && str[i])
 	{
 		if (str[i] == c)
 			return (i);

@@ -6,7 +6,7 @@
 #    By: admoufle <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/04/28 13:09:01 by admoufle          #+#    #+#              #
-#    Updated: 2025/04/29 10:39:02 by admoufle         ###   ########.fr        #
+#    Updated: 2025/06/23 10:13:09 by malfwa           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -52,11 +52,13 @@ SRC			=	ft_atoi.c		\
 				ft_split_set.c	\
 				ft_strmapi.c	\
 				ft_strdup.c		\
+				ft_free_null.c	\
 				ft_strncmp.c	\
 				ft_strnstr.c	\
 				ft_strchr.c		\
 				ft_strtrim.c	\
 				ft_strrchr.c	\
+				ft_strval.c		\
 				ft_substr.c		\
 				ft_tolower.c	\
 				ft_toupper.c
@@ -67,8 +69,10 @@ SRC_BONUS	=	ft_lstnew.c			\
 				ft_lstadd_front.c	\
 				ft_lstadd_back.c	\
 				ft_lstdelone.c		\
+				ft_lstdelpop.c		\
 				ft_lstclear.c		\
 				ft_lstiter.c		\
+				ft_lstsort.c		\
 				ft_lstmap.c
 
 OBJ			=	$(addprefix $(OBJ_DIR), $(SRC:.c=.o))

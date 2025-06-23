@@ -6,7 +6,7 @@
 /*   By: malfwa <admoufle@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/22 21:41:59 by malfwa            #+#    #+#             */
-/*   Updated: 2025/06/22 21:43:53 by malfwa           ###   ########.fr       */
+/*   Updated: 2025/06/23 09:54:30 by malfwa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -126,6 +126,8 @@ void		set_sigint_handler(int fds_to_close[2]);
 int			get_cmd_line_fd(int	*fd, t_prompt prompt, int history_fd);
 
 void		parse_rc(t_hash_table *table);
+void		alias(t_hash_table *table, char *str);
+bool		get_fd(int *fd);
 void		free_table(t_hash_table *table);
 int			_hash(char *key, int len);
 t_pair		*get_pair(t_hash_table *table, char *key, int len);
@@ -145,6 +147,10 @@ int			find_closing_bracket(char *opening_bracket);
 int			word_len(char *str, bool (*is_sep)(char ), int len);
 int			get_wlen(char *ptr, int len);
 int			dollar_len(char *str);
+bool		is_only_wildcard(char *str);
+void		pop_non_matching_files(t_list **head, char **patterns, char *raw_p);
+void		take_off_hidden_files(t_list **head);
+t_list		*get_all_files(void);
 
 //Prompt
 

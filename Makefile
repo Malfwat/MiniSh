@@ -6,7 +6,7 @@
 #    By: malfwa <admoufle@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/06/09 18:24:33 by malfwa            #+#    #+#              #
-#    Updated: 2025/06/22 19:17:14 by malfwa           ###   ########.fr        #
+#    Updated: 2025/06/23 09:55:00 by malfwa           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -32,12 +32,14 @@ SRC	+=	parsing/readline.c\
 		parsing/hash.c\
 		parsing/tilde.c\
 		parsing/manage_rcfile.c\
+		parsing/parse_rc.c\
 		parsing/snippet.c\
 		parsing/word_len.c\
 		parsing/hash_utils.c\
 		parsing/syntaxe/check_syntaxe.c\
 		parsing/syntaxe/alias.c\
-		parsing/wildcard/wildcard.c
+		parsing/wildcard/wildcard.c\
+		parsing/wildcard/manage_files.c
 
 SRC	+=	prompt/generate_prompt.c\
 		prompt/write_prompt.c

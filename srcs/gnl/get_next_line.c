@@ -6,11 +6,12 @@
 /*   By: amouflet <amouflet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/28 22:18:56 by amouflet          #+#    #+#             */
-/*   Updated: 2022/12/04 16:01:14 by amouflet         ###   ########.fr       */
+/*   Updated: 2025/06/23 10:00:18 by malfwa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
+#include "libft.h"
 
 static void	cpy(char **stash, char **line, t_buf *tmp)
 {
@@ -105,7 +106,7 @@ static char	*get_line(int fd, char *stash, char **line, t_buf *lst)
 		if (new_elem_back(&lst, stash) == -1)
 			return (NULL);
 	}
-	while (nb_read > 0 && in_str(stash, '\n') == -1)
+	while (nb_read > 0 && !ft_strchr(stash, '\n'))
 	{
 		nb_read = read(fd, stash, BUFFER_SIZE);
 		stash[(nb_read >= 0) * nb_read] = 0;
